@@ -33,6 +33,7 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleClick = async () => {
     // Handle both contract_address and contractAddress for compatibility
@@ -148,28 +149,29 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
         <div className="flex gap-6 mb-6">
           {/* Logo Area */}
           <div className="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-800 border-2 border-neutral-700 shadow-xl relative">
-            <img
-              src={token.image_url || getPlaceholderImage(token.name, token.ticker)}
-              alt={token.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                // Try secondary fallback
-                target.src = getPlaceholderImage(token.name, token.ticker);
-                target.onerror = () => {
-                  // Final fallback: hide image and show symbol
-                  target.style.display = 'none';
-                  const parent = target.parentElement;
-                  if (parent) {
-                    parent.innerHTML = `
-                      <div class="w-full h-full bg-gradient-to-br from-primary to-purple-500 rounded-2xl flex items-center justify-center">
-                        <span class="text-white text-4xl font-bold">${token.ticker?.charAt(0) || 'T'}</span>
-                      </div>
-                    `;
+            {!imageError ? (
+              <img
+                src={token.image_url || getPlaceholderImage(token.name, token.ticker)}
+                alt={token.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  // Try secondary fallback
+                  if (token.image_url) {
+                    target.src = getPlaceholderImage(token.name, token.ticker);
+                    target.onerror = () => {
+                      setImageError(true);
+                    };
+                  } else {
+                    setImageError(true);
                   }
-                };
-              }}
-            />
+                }}
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-primary to-purple-500 rounded-2xl flex items-center justify-center">
+                <span className="text-white text-4xl font-bold">{token.ticker?.charAt(0) || 'T'}</span>
+              </div>
+            )}
           </div>
 
           {/* Info Area */}
