@@ -120,30 +120,33 @@ export function useTokenIntegration(options: TokenIntegrationOptions = {}) {
       if (!tokenInfo) {
         // Check if offline mode is enabled
         if (import.meta.env.VITE_OFFLINE_MODE === 'true' || !import.meta.env.VITE_API_URL) {
-          // Mock token data for offline mode
-          tokenInfo = {
-            tokenAddress: address,
-            name: 'Mock Token',
-            symbol: 'MOCK',
-            metadata: '',
-            creator: '0x0000000000000000000000000000000000000000',
-            soldSupply: '1000000',
-            totalBNB: '10',
-            initialPrice: '0.01',
-            graduated: false,
-            exists: true
-          };
-          console.log('🔌 Offline mode: Using mock token data');
+          // Don't create mock token data - let TokenDetail handle the fallback
+          console.log('🔌 Offline mode: Skipping API call, letting TokenDetail handle fallback');
+          tokenInfo = null;
         } else {
-          tokenInfo = await apiService.getTokenInfo(address);
+          try {
+            tokenInfo = await apiService.getTokenInfo(address);
+          } catch (apiError) {
+            console.log('🔄 API call failed, letting TokenDetail handle fallback');
+            tokenInfo = null;
+          }
         }
-        setCachedData(cacheKey, tokenInfo);
+
+        if (tokenInfo) {
+          setCachedData(cacheKey, tokenInfo);
+        }
       }
 
       if (tokenInfo) {
         setState(prev => ({
           ...prev,
           token: tokenInfo,
+          loading: false
+        }));
+      } else {
+        // No token data found, stop loading but don't set token
+        setState(prev => ({
+          ...prev,
           loading: false
         }));
       }
