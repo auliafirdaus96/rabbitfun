@@ -133,8 +133,33 @@ const TokenDetail = () => {
 
   console.log('🔍 TokenDetail - contextToken found:', contextToken);
 
-  // Use token from integration hook, fallback to context, then to null
-  const displayToken = token || contextToken || null;
+  // If no token found in context, create a mock token based on the contract address
+  const createMockTokenFromAddress = (address: string) => {
+    // Generate a deterministic name/ticker from the address
+    const name = `Token ${address.slice(2, 6)}`;
+    const ticker = address.slice(2, 5).toUpperCase();
+
+    return {
+      name,
+      symbol: ticker,
+      ticker,
+      address,
+      contractAddress: address,
+      contract: address,
+      logo: ticker,
+      marketCap: "$0",
+      progress: 0,
+      priceChange: 0,
+      bnbCollected: "0",
+      isLive: true
+    };
+  };
+
+  const mockToken = !contextToken ? createMockTokenFromAddress(contractAddress) : null;
+  console.log('🔍 TokenDetail - mockToken created:', mockToken);
+
+  // Use token from integration hook, fallback to context, then to mock, then to null
+  const displayToken = token || contextToken || mockToken || null;
 
   // Helper function to get symbol/ticker from either TokenInfo or MockCoin
   const getTokenSymbol = useCallback((token: any) => {
