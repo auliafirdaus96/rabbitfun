@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { ExternalLink, Heart, TrendingUp, Star } from "lucide-react";
 import { CreatorLink } from "./CreatorLink";
 
+// Function to generate unique placeholder image based on token name
+const getPlaceholderImage = (name: string, ticker: string) => {
+  // Use a hash of the name to generate consistent images
+  const seed = `${name}-${ticker}`.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return `https://picsum.photos/seed/${seed}/200/200.jpg`;
+};
+
 interface FeaturedTokenCardProps {
   token: {
     id: string;
@@ -140,14 +147,27 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
         {/* Header Section */}
         <div className="flex gap-6 mb-6">
           {/* Logo Area */}
-          <div className="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-800 border-2 border-neutral-700 shadow-xl">
+          <div className="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-800 border-2 border-neutral-700 shadow-xl relative">
             <img
-              src={token.image_url || '/api/placeholder/128/128'}
+              src={token.image_url || getPlaceholderImage(token.name, token.ticker)}
               alt={token.name}
               className="w-full h-full object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = '/api/placeholder/128/128';
+                // Try secondary fallback
+                target.src = getPlaceholderImage(token.name, token.ticker);
+                target.onerror = () => {
+                  // Final fallback: hide image and show symbol
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="w-full h-full bg-gradient-to-br from-primary to-purple-500 rounded-2xl flex items-center justify-center">
+                        <span class="text-white text-4xl font-bold">${token.ticker?.charAt(0) || 'T'}</span>
+                      </div>
+                    `;
+                  }
+                };
               }}
             />
           </div>

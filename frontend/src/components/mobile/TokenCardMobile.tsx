@@ -97,10 +97,20 @@ export const TokenCardMobile = ({
                     alt={token.name}
                     className="w-10 h-10 rounded-lg object-cover"
                     loading="lazy"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `
+                          <span class="text-white text-lg font-bold">${token.symbol.charAt(0) || 'T'}</span>
+                        `;
+                      }
+                    }}
                   />
                 ) : (
                   <span className="text-white text-lg font-bold">
-                    {token.symbol.charAt(0)}
+                    {token.symbol.charAt(0) || 'T'}
                   </span>
                 )}
               </div>

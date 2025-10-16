@@ -144,14 +144,27 @@ export const TrendingTokenCard = ({ token }: TrendingTokenCardProps) => {
       style={{ cursor: 'pointer' }}
     >
       {/* Logo */}
-      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden flex-shrink-0 bg-input border border-black">
+      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden flex-shrink-0 bg-input border border-black relative">
         <img
-          src={getPlaceholderImage(token.name, token.ticker)}
+          src={token.image_url || getPlaceholderImage(token.name, token.ticker)}
           alt={token.name}
           className="w-full h-full object-cover"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = `https://picsum.photos/seed/crypto-${token.ticker}/200/200.jpg`;
+            // Try secondary fallback
+            target.src = getPlaceholderImage(token.name, token.ticker);
+            target.onerror = () => {
+              // Final fallback: hide image and show symbol
+              target.style.display = 'none';
+              const parent = target.parentElement;
+              if (parent) {
+                parent.innerHTML = `
+                  <div class="w-full h-full bg-gradient-to-br from-primary to-purple-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white text-lg font-bold">${token.ticker?.charAt(0) || 'T'}</span>
+                  </div>
+                `;
+              }
+            };
           }}
         />
       </div>
