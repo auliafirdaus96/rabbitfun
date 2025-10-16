@@ -2,6 +2,7 @@ import { TrendingUp, TrendingDown, Heart, Share2, ExternalLink, Clock } from "lu
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 interface TokenCardMobileProps {
   token: {
@@ -32,6 +33,7 @@ export const TokenCardMobile = ({
   onViewDetails,
   onBuy
 }: TokenCardMobileProps) => {
+  const navigate = useNavigate();
   const isPositive = token.priceChange24h >= 0;
   const formattedPrice = new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -56,8 +58,32 @@ export const TokenCardMobile = ({
     maximumFractionDigits: 1,
   }).format(token.volume24h);
 
+  // Generate deterministic contract address for navigation
+  const getContractAddress = () => {
+    const seed = `${token.name}-${token.symbol}`;
+    const hash = seed.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return `0x${hash.toString(16).padStart(40, '0').slice(0, 40)}`;
+  };
+
+  const handleCardClick = () => {
+    const contractAddress = getContractAddress();
+    console.log('🔄 Navigating to mobile token detail:', contractAddress);
+    navigate(`/token/${contractAddress}`);
+  };
+
+  const handleDetailsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const contractAddress = getContractAddress();
+    console.log('🔄 Navigating to mobile token detail (details button):', contractAddress);
+    navigate(`/token/${contractAddress}`);
+    onViewDetails?.(token);
+  };
+
   return (
-    <Card className="mobile-card-compact hover-card group cursor-pointer w-full">
+    <Card
+      className="mobile-card-compact hover-card group cursor-pointer w-full"
+      onClick={handleCardClick}
+    >
       <CardContent className="p-4">
         {/* Header Section */}
         <div className="flex items-start justify-between mb-3">
@@ -191,10 +217,7 @@ export const TokenCardMobile = ({
             variant="outline"
             size="sm"
             className="flex-1 touch-target-improved"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails?.(token);
-            }}
+            onClick={handleDetailsClick}
           >
             <ExternalLink className="h-4 w-4 mr-1" />
             Details
