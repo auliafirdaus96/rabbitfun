@@ -133,7 +133,30 @@ const TokenDetail = () => {
 
   console.log('🔍 TokenDetail - contextToken found:', contextToken);
 
-  // If no token found in context, create a mock token based on the contract address
+  // If no token found in context, try to find matching token by partial address
+  const findTokenByPartialAddress = (address: string) => {
+    const allTokens = [
+      ...searchState.filteredFeaturedCoins,
+      ...searchState.filteredProjects
+    ];
+
+    // Try to find token by matching partial address or similar pattern
+    return allTokens.find(token => {
+      if (!token.contractAddress && !token.contract) return false;
+      const tokenAddress = token.contractAddress || token.contract;
+      if (!tokenAddress) return false;
+
+      // Check if the address contains the same pattern (first 8 chars)
+      const addressPart = address.slice(0, 8).toLowerCase();
+      const tokenAddressPart = tokenAddress.slice(0, 8).toLowerCase();
+
+      return addressPart === tokenAddressPart;
+    });
+  };
+
+  const foundToken = !contextToken ? findTokenByPartialAddress(contractAddress) : contextToken;
+
+  // If still no token found, create a mock token based on the contract address
   const createMockTokenFromAddress = (address: string) => {
     // Generate a deterministic name/ticker from the address
     const name = `Token ${address.slice(2, 6)}`;
@@ -155,11 +178,11 @@ const TokenDetail = () => {
     };
   };
 
-  const mockToken = !contextToken ? createMockTokenFromAddress(contractAddress) : null;
+  const mockToken = !foundToken ? createMockTokenFromAddress(contractAddress) : null;
   console.log('🔍 TokenDetail - mockToken created:', mockToken);
 
-  // Use token from integration hook, fallback to context, then to mock, then to null
-  const displayToken = token || contextToken || mockToken || null;
+  // Use token from integration hook, fallback to found token, then to mock, then to null
+  const displayToken = token || foundToken || mockToken || null;
 
   // Helper function to get symbol/ticker from either TokenInfo or MockCoin
   const getTokenSymbol = useCallback((token: any) => {
