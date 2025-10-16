@@ -158,17 +158,36 @@ const TokenDetail = () => {
 
   // If still no token found, create a mock token based on the contract address
   const createMockTokenFromAddress = (address: string) => {
-    // Generate a deterministic name/ticker from the address
-    const name = `Token ${address.slice(2, 6)}`;
-    const ticker = address.slice(2, 5).toUpperCase();
+    // Generate a deterministic name/ticker from the address with fallbacks
+    let name: string;
+    let ticker: string;
+
+    if (address && address.length >= 6) {
+      // Extract meaningful part of address for name (skip "0x")
+      const meaningfulPart = address.slice(2, 6);
+      // Use first 3 chars for ticker if available
+      const tickerPart = address.slice(2, 5);
+
+      name = `Token ${meaningfulPart.toUpperCase()}`;
+      ticker = tickerPart.toUpperCase();
+    } else {
+      // Fallback for invalid/empty addresses
+      name = "New Token";
+      ticker = "NEW";
+    }
+
+    // Ensure ticker is not just zeros
+    if (ticker === "000" || ticker === "00" || ticker === "0") {
+      ticker = "NEW";
+    }
 
     return {
       name,
       symbol: ticker,
       ticker,
-      address,
-      contractAddress: address,
-      contract: address,
+      address: address || "0x0000000000000000000000000000000000000000",
+      contractAddress: address || "0x0000000000000000000000000000000000000000",
+      contract: address || "0x0000000000000000000000000000000000000000",
       logo: ticker,
       marketCap: "$0",
       progress: 0,
