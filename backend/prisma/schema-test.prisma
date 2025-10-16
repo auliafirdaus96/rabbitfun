@@ -1,0 +1,300 @@
+// Test-specific Prisma schema with additional test models
+// This extends the main schema with test-specific models and configurations
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma-test"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_DATABASE_URL")
+}
+
+// Include all main schema models
+// User model for wallet-based authentication
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique @db.VarChar(42)
+  email         String?  @unique @db.VarChar(255)
+  username      String?  @unique @db.VarChar(50)
+  displayName   String?  @db.VarChar(100)
+  avatar        String?  @db.Text
+  bio           String?  @db.Text
+  twitterHandle String?  @db.VarChar(50)
+  telegramHandle String? @db.VarChar(50)
+  website       String?  @db.VarChar(255)
+  isActive      Boolean  @default(true)
+  isAdmin       Boolean  @default(false)
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  createdTokens    Token[]         @relation("TokenCreator")
+  transactions     Transaction[]
+  tokenFavorites    TokenFavorite[]
+  userAnalytics     UserAnalytics[]
+
+  @@map("users")
+}
+
+// Token model created through smart contract
+model Token {
+  id             String   @id @default(cuid())
+  address        String   @unique @db.VarChar(42)
+  name           String   @db.VarChar(100)
+  symbol         String   @db.VarChar(10)
+  metadata       String?  @db.Text
+  creatorId      String   @db.VarChar(42)
+  creatorAddress String   @db.VarChar(42)
+
+  // Contract state
+  soldSupply     String   @default("0") @db.VarChar(78) // BigInt as string
+  totalBNB       String   @default("0") @db.VarChar(78) // BigInt as string
+  initialPrice   String   @default("0") @db.VarChar(78) // BigInt as string
+  graduated      Boolean  @default(false)
+  exists         Boolean  @default(true)
+
+  // Additional tracking
+  totalPlatformFees  String @default("0") @db.VarChar(78) // BigInt as string
+  totalCreatorFees   String @default("0") @db.VarChar(78) // BigInt as string
+  bondingCurveLiquidity String @default("0") @db.VarChar(78) // BigInt as string
+  liquidityPoolAmount String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  graduatedAt    DateTime?
+
+  // Optional metadata
+  description    String?  @db.Text
+  imageUrl       String?  @db.VarChar(500)
+  bannerUrl      String?  @db.VarChar(500)
+  twitterUrl     String?  @db.VarChar(255)
+  telegramUrl    String?  @db.VarChar(255)
+  websiteUrl     String?  @db.VarChar(255)
+
+  // Status and moderation
+  isActive       Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  isVerified     Boolean  @default(false)
+  isHidden       Boolean  @default(false)
+  hideReason     String?  @db.Text
+
+  // Relations
+  transactions   Transaction[]
+  tokenFavorites TokenFavorite[]
+  tokenAnalytics TokenAnalytics[]
+  priceHistory   TokenPriceHistory[]
+
+  // Creator relation (reference to User if exists)
+  creator        User?    @relation("TokenCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+
+  @@map("tokens")
+}
+
+// Transaction model for all buy/sell operations
+model Transaction {
+  id            String   @id @default(cuid())
+  hash          String   @unique @db.VarChar(66) // Transaction hash
+  blockNumber   String   @db.VarChar(78) // BigInt as string
+  blockHash     String   @db.VarChar(66)
+  transactionIndex Int
+
+  // Transaction details
+  type          TransactionType // BUY or SELL
+  tokenId       String   @db.VarChar(42)
+  tokenAddress  String   @db.VarChar(42)
+  traderAddress String   @db.VarChar(42)
+
+  // Amounts
+  tokenAmount   String   @db.VarChar(78) // BigInt as string
+  bnbAmount     String   @db.VarChar(78) // BigInt as string
+  price         String   @db.VarChar(78) // BigInt as string
+
+  // Fees
+  platformFee   String  @default("0") @db.VarChar(78) // BigInt as string
+  creatorFee    String  @default("0") @db.VarChar(78) // BigInt as string
+  totalFee      String  @default("0") @db.VarChar(78) // BigInt as string
+
+  // Price impact
+  priceImpact   String  @default("0") // Decimal as string
+
+  // Status
+  status        TransactionStatus @default(PENDING)
+  gasUsed       String? @db.VarChar(78) // BigInt as string
+  gasPrice      String? @db.VarChar(78) // BigInt as string
+  errorMessage  String? @db.Text
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  confirmedAt   DateTime?
+
+  // Relations
+  token         Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  trader        User?    @relation(fields: [traderAddress], references: [walletAddress], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+// Token favorites for users
+model TokenFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenId   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tokenId])
+  @@map("token_favorites")
+}
+
+// Analytics data for tokens
+model TokenAnalytics {
+  id          String   @id @default(cuid())
+  tokenId     String
+  date        DateTime @default(now()) @db.Date
+
+  // Trading metrics
+  totalVolume  String @default("0") @db.VarChar(78) // BigInt as string
+  totalTrades  Int    @default(0)
+  totalBuyers  Int    @default(0)
+  totalSellers Int    @default(0)
+
+  // Price metrics
+  openPrice    String @default("0") @db.VarChar(78) // BigInt as string
+  closePrice   String @default("0") @db.VarChar(78) // BigInt as string
+  highPrice    String @default("0") @db.VarChar(78) // BigInt as string
+  lowPrice     String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Market metrics
+  marketCap    String @default("0") @db.VarChar(78) // BigInt as string
+  liquidity    String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Relations
+  token        Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenId, date])
+  @@map("token_analytics")
+}
+
+// User activity analytics
+model UserAnalytics {
+  id      String   @id @default(cuid())
+  userId  String
+  date    DateTime @default(now()) @db.Date
+
+  // Activity metrics
+  tokensCreated    Int @default(0)
+  transactionsMade Int @default(0)
+  volumeTraded     String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Portfolio metrics
+  portfolioValue   String @default("0") @db.VarChar(78) // BigInt as string
+  holdingsCount    Int @default(0)
+  favoritesCount   Int @default(0)
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("user_analytics")
+}
+
+// Token price history for charts
+model TokenPriceHistory {
+  id        String   @id @default(cuid())
+  tokenId   String
+  timestamp DateTime @default(now())
+  price     String   @db.VarChar(78) // BigInt as string
+  supply    String   @default("0") @db.VarChar(78) // BigInt as string
+
+  // Relations
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("token_price_history")
+}
+
+// System configuration
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_config")
+}
+
+// Audit logs for admin actions
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?  @db.VarChar(42)
+  action      String   @db.VarChar(100)
+  resource    String   @db.VarChar(100)
+  resourceId  String?
+  oldValue    String?  @db.Text
+  newValue    String?  @db.Text
+  ipAddress   String?  @db.VarChar(45)
+  userAgent   String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+// Test-specific models for database testing
+model TestUser {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique @db.VarChar(42)
+  email         String?  @unique @db.VarChar(255)
+  username      String?  @unique @db.VarChar(50)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("test_users")
+}
+
+model TestToken {
+  id             String   @id @default(cuid())
+  address        String   @unique @db.VarChar(42)
+  name           String   @db.VarChar(100)
+  symbol         String   @db.VarChar(10)
+  creatorId      String   @db.VarChar(42)
+  totalSupply    String   @default("1000000") @db.VarChar(78)
+  price          String   @default("1000000000000000") @db.VarChar(78) // 0.001 BNB
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("test_tokens")
+}
+
+model TestTransaction {
+  id            String   @id @default(cuid())
+  hash          String   @unique @db.VarChar(66)
+  tokenId       String
+  traderAddress String   @db.VarChar(42)
+  type          String   @db.VarChar(10) // BUY or SELL
+  amount        String   @db.VarChar(78)
+  price         String   @db.VarChar(78)
+  createdAt     DateTime @default(now())
+
+  @@map("test_transactions")
+}
+
+// Enums
+enum TransactionType {
+  BUY
+  SELL
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}

@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@test/*": ["./test/*"],
+      "@contracts/*": ["./client/src/types/contracts/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./typechain-types"],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "test/**/*",
+    "client/src/types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "artifacts"
+  ]
+}

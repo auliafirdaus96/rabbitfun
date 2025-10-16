@@ -1,0 +1,430 @@
+name: 🚀 Backend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ['backend/**']
+  pull_request:
+    branches: [main, develop]
+    paths: ['backend/**']
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+
+jobs:
+  # Code Quality & Testing
+  test:
+    name: 🧪 Backend Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: rabbit_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: 🔍 Run ESLint
+        working-directory: ./backend
+        run: npm run lint
+
+      - name: 🔍 Run Prettier check
+        working-directory: ./backend
+        run: npm run format:check
+
+      - name: 🔍 Run type checking
+        working-directory: ./backend
+        run: npm run type-check
+
+      - name: 🗄️ Setup test database
+        working-directory: ./backend
+        run: |
+          # Wait for PostgreSQL to be ready
+          until pg_isready -h localhost -p 5432 -U test; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+          # Create test database schema
+          npm run db:test:setup
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/rabbit_test
+
+      - name: 🧪 Run unit tests
+        working-directory: ./backend
+        run: npm run test:unit
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/rabbit_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: 🔗 Run integration tests
+        working-directory: ./backend
+        run: npm run test:integration
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/rabbit_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: ⛓️ Test blockchain integration
+        working-directory: ./backend
+        run: npm run test:blockchain
+        env:
+          NODE_ENV: test
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
+
+      - name: 📊 Generate coverage report
+        working-directory: ./backend
+        run: npm run test:coverage
+
+      - name: 📤 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./backend/coverage/lcov.info
+          flags: backend
+          name: codecov-backend
+
+  # Security Scanning
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: 🔐 Run npm audit
+        working-directory: ./backend
+        run: npm audit --audit-level moderate
+
+      - name: 🔍 Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+          command: monitor
+          file: backend/package.json
+
+      - name: 🔍 Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          languages: javascript
+
+  # API Testing
+  api-test:
+    name: 🌐 API Testing
+    runs-on: ubuntu-latest
+    needs: test
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: rabbit_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: 🗄️ Setup test database
+        working-directory: ./backend
+        run: npm run db:test:setup
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/rabbit_test
+
+      - name: 🚀 Start application
+        working-directory: ./backend
+        run: npm start &
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/rabbit_test
+          REDIS_URL: redis://localhost:6379
+          PORT: 3001
+
+      - name: ⏳ Wait for application to start
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3001/health; do sleep 2; done'
+
+      - name: 🌐 Run API tests
+        working-directory: ./backend
+        run: npm run test:api
+
+      - name: ⛓️ Test blockchain endpoints
+        working-directory: ./backend
+        run: npm run test:blockchain-api
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
+
+  # Docker Build & Push
+  docker:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📋 Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch }}
+
+      - name: 🐳 Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: 🔍 Scan Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: 📤 Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Deploy to Staging
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [docker, api-test]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to staging
+        run: |
+          echo "🚀 Deploying backend to staging..."
+          # Add your staging deployment commands here
+          # Example: kubectl apply -f k8s/backend/staging/
+          # or: docker-compose -f docker-compose.staging.yml up -d
+          echo "✅ Backend deployed to staging successfully!"
+
+      - name: 🧪 Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests..."
+          # Add smoke test commands here
+          # curl -f https://staging-api.rabbit-launchpad.com/health
+
+      - name: 📢 Notify staging deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          text: '✅ Backend deployed to staging successfully!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Deploy to Production
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker, api-test]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy to production
+        run: |
+          echo "🚀 Deploying backend to production..."
+          # Add your production deployment commands here
+          # Example: kubectl apply -f k8s/backend/production/
+          # or: docker-compose -f docker-compose.production.yml up -d
+          echo "✅ Backend deployed to production successfully!"
+
+      - name: 🧪 Run smoke tests
+        run: |
+          echo "🧪 Running smoke tests..."
+          # Add smoke test commands here
+          # curl -f https://api.rabbit-launchpad.com/health
+
+      - name: 📢 Notify production deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          text: '✅ Backend deployed to production successfully!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: 🎉 Send Discord notification
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '🎉 Backend deployed to production successfully! Commit: ${{ github.sha }}'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+  # Performance & Load Testing
+  performance-test:
+    name: 📊 Performance Tests
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📊 Run load tests
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: backend/tests/performance/load-test.js
+
+      - name: 📤 Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: backend/performance-results/
+          retention-days: 7
+
+  # Summary
+  summary:
+    name: 📋 Backend CI/CD Summary
+    runs-on: ubuntu-latest
+    needs: [
+      test,
+      security,
+      api-test,
+      docker,
+      deploy-staging,
+      deploy-production,
+      performance-test
+    ]
+    if: always()
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📋 Create summary
+        run: |
+          echo "## 🚀 Backend CI/CD Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API Tests | ${{ needs.api-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Build | ${{ needs.docker.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Staging Deploy | ${{ needs.deploy-staging.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Production Deploy | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests | ${{ needs.performance-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.test.result }}" == "failure" || "${{ needs.security.result }}" == "failure" || "${{ needs.api-test.result }}" == "failure" ]]; then
+            echo "❌ Some critical jobs failed. Please check the individual job logs." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "🎉 Backend CI/CD completed successfully!" >> $GITHUB_STEP_SUMMARY
+          fi

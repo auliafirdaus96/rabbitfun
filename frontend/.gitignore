@@ -1,0 +1,619 @@
+# ==============================================
+# Ahiru Launchpad - Frontend .gitignore
+# ==============================================
+
+# ---------- System & OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+
+# ---------- IDE & Editors ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- Dependencies ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+lerna-debug.log*
+jspm_packages/
+
+# ---------- Environment Variables ----------
+# CRITICAL: Never commit environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.development
+.env.test
+.env.staging
+.env.production
+
+# ---------- Build & Output ----------
+dist/
+dist-ssr/
+build/
+out/
+.output/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.vite/
+
+# ---------- React & Next.js Specific ----------
+.next/
+out/
+build
+.swc/
+.esbuild/
+
+# ---------- Vite Specific ----------
+dist-ssr/
+*.local
+
+# ---------- Cache ----------
+.npm
+.yarn
+.pnpm
+pnpm-store.yaml
+.eslintcache
+.stylelintcache
+.node_repl_history
+.tsbuildinfo
+
+# ---------- Coverage & Testing ----------
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+.c8-coverage/
+scout/
+test-coverage/
+junit.xml
+playwright-report/
+test-results.xml
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+pnpm-error.log*
+error.log
+debug.log
+warn.log
+
+# ---------- Runtime Data ----------
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ---------- Package Manager ----------
+*.tgz
+.yarn-integrity
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+package-lock.json.bak
+node_modules/.package-lock.json
+
+# ---------- Storybook ----------
+.out
+.storybook-out
+storybook-static/
+
+# ---------- Gatsby ----------
+.cache/
+public
+
+# ---------- Nuxt.js ----------
+.nuxt
+dist
+
+# ---------- Temporary Files ----------
+tmp/
+temp/
+.tmp/
+.temp/
+*.tmp
+*.bak
+*.backup
+*.old
+
+# ---------- IDE & Editor Files ----------
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/uiDesigner.xml
+.idea/shelf
+.idea/contentModel.xml
+
+# ---------- OS Generated Files ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ---------- Monitoring & Analytics ----------
+*.prof
+*.mp3
+*.wav
+*.pdf
+
+# ---------- Documentation ----------
+docs/build/
+site/
+*.md.bak
+
+# ---------- Platform Specific ----------
+.vercel/
+.netlify/
+.local/
+
+# ---------- Frontend Specific ----------
+# Source maps (for production security)
+*.js.map
+*.css.map
+*.map
+
+# Environment build files
+.env.production
+.env.staging
+.env.development
+
+# Bundle analysis
+bundle-analyzer/
+bundle-report/
+webpack-bundle-analyzer/
+
+# Lighthouse reports
+lighthouse-reports/
+.performance/
+
+# End-to-end testing
+e2e/screenshots/
+e2e/videos/
+e2e/traces/
+
+# Component library build
+storybook-static/
+lib/
+
+# Static assets optimization
+next-optimized-images/
+*.webp.optimized
+*.jpg.optimized
+
+# Cache directories
+.eslintcache
+.stylelintcache
+.postcssrc.json
+
+# Development server
+.dev-server/
+development-server/
+
+# API keys in frontend (NEVER commit)
+config/api-keys.json
+config/credentials.json
+src/config/secrets.ts
+src/config/private.ts
+
+# User generated content
+user-content/
+uploads/
+static/uploads/
+
+# Testing artifacts
+coverage/
+test-results/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
+
+# Build artifacts
+dist/
+build/
+.out/
+
+# Dependency lock files (keep package-lock.json)
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Package manager specific
+package-lock.json.bak
+node_modules/.package-lock.json
+
+# Docker
+.dockerignore
+Dockerfile.dev
+docker-compose.override.yml
+docker-compose.prod.yml
+
+# Kubernetes
+*.yaml.local
+*.yaml.dev
+*.yaml.staging
+*.yaml.prod
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+.terraformrc
+
+# Monitoring and Analytics
+sentry-properties/
+sentry.config.js
+
+# Development tools
+.prettierignore
+.stylelintcache
+
+# Temporary development files
+.temp/
+.temp-build/
+
+# Cache busting
+.cache-busting/
+
+# Asset optimization
+.optimized-assets/
+
+# Progressive Web App
+manifest.json.local
+sw.js.local
+
+# Static site generation
+.gatsby-cache/
+.public-cache/
+
+# CSS preprocessor cache
+.sass-cache/
+.less-cache/
+.stylus-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Build tools
+.rollup.cache/
+.parcel-cache/
+.esbuild.cache/
+
+# Frontend testing
+jest-coverage/
+vitest-coverage/
+
+# Component documentation
+component-docs/
+api-extractor/
+
+# Bundle analysis tools
+webpack-stats.json
+bundle-stats/
+
+# Development server logs
+dev-server.log
+hot-reload.log
+
+# Error monitoring
+error-boundary-logs/
+
+# Performance monitoring
+performance-metrics/
+
+# SEO tools
+seo-audit/
+lighthouse-results/
+
+# Accessibility testing
+axe-reports/
+a11y-results/
+
+# Localization (except source files)
+locale-build/
+translations-built/
+
+# Image optimization
+.image-cache/
+.optimized-images/
+
+# Font optimization
+.font-cache/
+.optimized-fonts/
+
+# Browser compatibility
+browser-compatibility/
+polyfills-built/
+
+# Progressive enhancement
+.fallback-builds/
+
+# CDN assets
+cdn-assets/
+static-cdn/
+
+# Build configuration
+webpack.config.local.js
+vite.config.local.ts
+next.config.local.js
+
+# API integration files (examples - not production code)
+src/examples/
+
+# Development tools and examples
+examples/
+
+# ---------- Additional Security & Modern Development ----------
+# Claude Code and AI assistants
+.claude/
+claude-session-history/
+ai-assistant-cache/
+llm-cache/
+
+# Vercel CLI
+.vercel/output/
+
+# Netlify CLI
+.netlify/cache/
+
+# Cloudflare Pages
+.wrangler/output/
+
+# Sentry CLI
+.sentryclirc
+
+# Docker build context exclusion
+.dockerbuild/
+
+# Kubernetes secrets
+secrets/
+*.secrets.yaml
+
+# Helm charts local values
+charts/values.local.yaml
+charts/values.dev.yaml
+charts/values.staging.yaml
+
+# Terraform state files (backend-specific)
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
+
+# Ansible
+ansible-vault/
+ansible/inventory.local
+ansible/group_vars/local/
+ansible/host_vars/local/
+
+# Monitoring and Observability
+prometheus-data/
+grafana-data/
+alertmanager-data/
+loki-data/
+tempo-data/
+
+# CI/CD Pipeline
+.github/workflows/temp/
+.gitlab-ci-local/
+bitbucket-pipelines.local.yml
+
+# Performance and Load Testing
+k6-results/
+artillery-results/
+gatling-results/
+jmeter-results/
+
+# Security Scanning
+snyk-report.json
+trivy-results.json
+dependency-check-report.html
+npm-audit-report.json
+
+# License Compliance
+license-report/
+third-party-licenses/
+FOSSA-report/
+
+# Documentation Build
+docs/_build/
+docs/.doctrees/
+site/
+
+# Localization Build
+locale-build/
+i18n-build/
+translations-compiled/
+
+# Mobile Development
+ios-build/
+android-build/
+cordova-build/
+ionic-build/
+react-native-build/
+
+# Desktop Applications
+electron-build/
+tauri-build/
+nwjs-build/
+
+# Serverless Functions
+netlify/functions/
+vercel/functions/
+cloudflare-workers/
+
+# Database Tools
+pgadmin-data/
+dbeaver-data/
+data-grip/
+sql-logs/
+
+# API Testing
+postman-environments/
+insomnia-environment.json
+graphql-schema.json
+
+# Blockchain Development (Additional)
+metamask-seed.json
+wallet-mnemonics.txt
+hardhat-accounts.json
+testnet-deployments/
+local-chain-data/
+
+# Development Scripts Local Overrides
+scripts/*.local.js
+scripts/*.local.ts
+scripts/local-*
+
+# Environment Configuration Overrides
+config/local/
+config/development/
+config/staging/
+config/production/
+
+# Analytics and Tracking
+google-analytics.json
+segment-config.json
+mixpanel-config.json
+
+# CDN Configuration
+cloudfront-invalidation.json
+fastly-config.json
+
+# SSL Certificates (Development Only)
+ssl-local/
+certs-local/
+*.local.crt
+*.local.key
+
+# Backup and Archive Files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+backup-*
+archive-*
+
+# Temporary Build Artifacts
+.temp-build/
+.temp-dist/
+.temp-out/
+
+# Development Servers
+dev-server.pid
+dev-server.log
+hot-reloader.log
+
+# Code Quality Tools
+sonar-project.properties
+codeclimate.json
+codecov.yml.local
+
+# IDE Specific - Additional
+.vscode-insiders/
+.idea-ultimate/
+*.sublime-project
+*.sublime-workspace
+
+# macOS Specific - Additional
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows Specific - Additional
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux Specific - Additional
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Package Managers - Additional
+.pnpm-debug.log*
+.yarn-debug.log*
+.yarn-error.log*
+.lerna-debug.log*
+
+# Build Tools - Additional
+.webpack-cache/
+.parcel-cache/
+.esbuild-cache/
+.rollup.cache/
+.vite-cache/
+
+# Testing Frameworks - Additional
+.cypress-cache/
+.playwright-cache/
+testcafe-results/
+wdio-reports/
+
+# Important files to keep (exceptions)
+!.env.example
+!.github/workflows/deploy.yml
+!Dockerfile
+!docker-compose.yml
+!README.md
+!package.json
+!package-lock.json
+!tsconfig.json
+!vite.config.ts
+!tailwind.config.js
+!postcss.config.js
+.vercel

@@ -1,0 +1,484 @@
+// Production Database Schema for Rabbit Launchpad
+// This schema is optimized for production workloads with proper indexing and constraints
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma-production"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PRODUCTION_DATABASE_URL")
+}
+
+// User model for wallet-based authentication
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique @db.VarChar(42) @index(map("idx_wallet_address"))
+  email         String?  @unique @db.VarChar(255) @index(map("idx_email"))
+  username      String?  @unique @db.VarChar(50) @index(map("idx_username"))
+  displayName   String?  @db.VarChar(100)
+  avatar        String?  @db.Text
+  bio           String?  @db.Text
+  twitterHandle String?  @db.VarChar(50)
+  telegramHandle String? @db.VarChar(50)
+  website       String?  @db.VarChar(255)
+
+  // Status and permissions
+  isActive      Boolean  @default(true) @index(map("idx_user_active"))
+  isAdmin       Boolean  @default(false)
+  isVerified    Boolean  @default(false) @index(map("idx_user_verified"))
+  isBanned      Boolean  @default(false)
+  banReason     String?  @db.Text
+  bannedAt      DateTime?
+
+  // Security and tracking
+  lastLoginAt    DateTime?
+  loginCount     Int      @default(0)
+  emailVerified  Boolean  @default(false)
+  emailVerificationToken String? @db.VarChar(255)
+  passwordResetToken    String? @db.VarChar(255)
+  passwordResetExpires  DateTime?
+
+  // Timestamps
+  createdAt     DateTime @default(now()) @index(map("idx_user_created"))
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  createdTokens    Token[]         @relation("TokenCreator")
+  transactions     Transaction[]
+  tokenFavorites    TokenFavorite[]
+  userAnalytics     UserAnalytics[]
+  auditLogs        AuditLog[]
+  userSessions     UserSession[]
+
+  @@map("users")
+}
+
+// User session management
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String   @index(map("idx_session_user"))
+  token     String   @unique @db.VarChar(255) @index(map("idx_session_token"))
+  ipAddress String?  @db.VarChar(45) @index(map("idx_session_ip"))
+  userAgent String?  @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @index(map("idx_session_created"))
+  expiresAt DateTime @index(map("idx_session_expires"))
+  lastAccessAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+// Token model created through smart contract
+model Token {
+  id             String   @id @default(cuid())
+  address        String   @unique @db.VarChar(42) @index(map("idx_token_address"))
+  name           String   @db.VarChar(100) @index(map("idx_token_name"))
+  symbol         String   @db.VarChar(10) @index(map("idx_token_symbol"))
+  metadata       String?  @db.Text
+  creatorId      String   @db.VarChar(42) @index(map("idx_token_creator"))
+  creatorAddress String   @db.VarChar(42) @index(map("idx_token_creator_address"))
+
+  // Contract state
+  soldSupply     String   @default("0") @db.VarChar(78) // BigInt as string
+  totalBNB       String   @default("0") @db.VarChar(78) // BigInt as string
+  initialPrice   String   @default("0") @db.VarChar(78) // BigInt as string
+  currentPrice   String   @default("0") @db.VarChar(78) // BigInt as string
+  graduated      Boolean  @default(false) @index(map("idx_token_graduated"))
+  exists         Boolean  @default(true)
+
+  // Financial tracking
+  totalPlatformFees  String @default("0") @db.VarChar(78) // BigInt as string
+  totalCreatorFees   String @default("0") @db.VarChar(78) // BigInt as string
+  bondingCurveLiquidity String @default("0") @db.VarChar(78) // BigInt as string
+  liquidityPoolAmount String @default("0") @db.VarChar(78) // BigInt as string
+  marketCap          String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Timestamps
+  createdAt      DateTime @default(now()) @index(map("idx_token_created"))
+  updatedAt      DateTime @updatedAt
+  graduatedAt    DateTime?
+  lastTradeAt     DateTime? @index(map("idx_token_last_trade"))
+
+  // Optional metadata
+  description    String?  @db.Text
+  imageUrl       String?  @db.VarChar(500)
+  bannerUrl      String?  @db.VarChar(500)
+  twitterUrl     String?  @db.VarChar(255)
+  telegramUrl    String?  @db.VarChar(255)
+  websiteUrl     String?  @db.VarChar(255)
+  discordUrl     String?  @db.VarChar(255)
+
+  // Status and moderation
+  isActive       Boolean  @default(true) @index(map("idx_token_active"))
+  isFeatured     Boolean  @default(false) @index(map("idx_token_featured"))
+  isVerified     Boolean  @default(false) @index(map("idx_token_verified"))
+  isHidden       Boolean  @default(false) @index(map("idx_token_hidden"))
+  hideReason     String?  @db.Text
+  isLocked       Boolean  @default(false) @index(map("idx_token_locked"))
+  lockReason     String?  @db.Text
+
+  // Moderation tracking
+  moderatedBy     String? @db.VarChar(42)
+  moderatedAt     DateTime?
+  moderationReason String? @db.Text
+
+  // Relations
+  transactions   Transaction[]
+  tokenFavorites TokenFavorite[]
+  tokenAnalytics TokenAnalytics[]
+  priceHistory   TokenPriceHistory[]
+  tokenAlerts    TokenAlert[]
+
+  // Creator relation (reference to User if exists)
+  creator        User?    @relation("TokenCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+
+  @@map("tokens")
+}
+
+// Transaction model for all buy/sell operations
+model Transaction {
+  id            String   @id @default(cuid())
+  hash          String   @unique @db.VarChar(66) @index(map("idx_tx_hash"))
+  blockNumber   String   @db.VarChar(78) @index(map("idx_tx_block")) // BigInt as string
+  blockHash     String   @db.VarChar(66)
+  transactionIndex Int
+  logIndex      Int?
+
+  // Transaction details
+  type          TransactionType @index(map("idx_tx_type"))
+  tokenId       String   @index(map("idx_tx_token"))
+  tokenAddress  String   @db.VarChar(42) @index(map("idx_tx_token_address"))
+  traderAddress String   @db.VarChar(42) @index(map("idx_tx_trader"))
+
+  // Amounts
+  tokenAmount   String   @db.VarChar(78) // BigInt as string
+  bnbAmount     String   @db.VarChar(78) // BigInt as string
+  price         String   @db.VarChar(78) // BigInt as string
+  priceBefore   String   @db.VarChar(78) // BigInt as string
+  priceAfter    String   @db.VarChar(78) // BigInt as string
+
+  // Fees
+  platformFee   String   @default("0") @db.VarChar(78) // BigInt as string
+  creatorFee    String   @default("0") @db.VarChar(78) // BigInt as string
+  totalFee      String   @default("0") @db.VarChar(78) // BigInt as string
+  feePercentage String   @default("0.1") // Decimal as string
+
+  // Market impact
+  priceImpact   String   @default("0") // Decimal as string
+  slippage      String   @default("0") // Decimal as string
+
+  // Status and processing
+  status        TransactionStatus @default(PENDING) @index(map("idx_tx_status"))
+  processedAt   DateTime?
+  confirmedAt   DateTime?
+  failedAt      DateTime?
+  errorMessage  String?  @db.Text
+  retryCount    Int      @default(0)
+  maxRetries    Int      @default(3)
+
+  // Gas information
+  gasUsed       String?  @db.VarChar(78) // BigInt as string
+  gasPrice      String?  @db.VarChar(78) // BigInt as string
+  gasLimit      String?  @db.VarChar(78) // BigInt as string
+  effectiveGasPrice String? @db.VarChar(78) // BigInt as string
+
+  // Timestamps
+  createdAt     DateTime @default(now()) @index(map("idx_tx_created"))
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  token         Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  trader        User?    @relation(fields: [traderAddress], references: [walletAddress], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+// Token favorites for users
+model TokenFavorite {
+  id        String   @id @default(cuid())
+  userId    String   @index(map("idx_fav_user"))
+  tokenId   String   @index(map("idx_fav_token"))
+  createdAt DateTime @default(now()) @index(map("idx_fav_created"))
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tokenId])
+  @@map("token_favorites")
+}
+
+// Analytics data for tokens
+model TokenAnalytics {
+  id          String   @id @default(cuid())
+  tokenId     String   @index(map("idx_analytics_token"))
+  date        DateTime @default(now()) @db.Date @index(map("idx_analytics_date"))
+
+  // Trading metrics
+  totalVolume  String @default("0") @db.VarChar(78) // BigInt as string
+  totalTrades  Int    @default(0)
+  totalBuyers  Int    @default(0)
+  totalSellers Int    @default(0)
+  uniqueTraders Int   @default(0)
+
+  // Price metrics
+  openPrice    String @default("0") @db.VarChar(78) // BigInt as string
+  closePrice   String @default("0") @db.VarChar(78) // BigInt as string
+  highPrice    String @default("0") @db.VarChar(78) // BigInt as string
+  lowPrice     String @default("0") @db.VarChar(78) // BigInt as string
+  priceChange  String @default("0") // Decimal as string
+  priceChangePercentage String @default("0") // Decimal as string
+
+  // Market metrics
+  marketCap    String @default("0") @db.VarChar(78) // BigInt as string
+  liquidity    String @default("0") @db.VarChar(78) // BigInt as string
+  volume24h    String @default("0") @db.VarChar(78) // BigInt as string
+  volume24hChange String @default("0") // Decimal as string
+
+  // Holder metrics
+  holderCount  Int    @default(0)
+  newHolders   Int    @default(0)
+  circulatingSupply String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  token        Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenId, date])
+  @@map("token_analytics")
+}
+
+// User activity analytics
+model UserAnalytics {
+  id      String   @id @default(cuid())
+  userId  String   @index(map("idx_user_analytics_user"))
+  date    DateTime @default(now()) @db.Date @index(map("idx_user_analytics_date"))
+
+  // Activity metrics
+  tokensCreated    Int @default(0)
+  transactionsMade Int @default(0)
+  volumeTraded     String @default("0") @db.VarChar(78) // BigInt as string
+  profitLoss       String @default("0") @db.VarChar(78) // BigInt as string
+
+  // Portfolio metrics
+  portfolioValue   String @default("0") @db.VarChar(78) // BigInt as string
+  holdingsCount    Int @default(0)
+  favoritesCount   Int @default(0)
+  watchlistCount   Int @default(0)
+
+  // Activity tracking
+  loginCount       Int @default(0)
+  lastActivity     DateTime?
+  sessionDuration  Int @default(0) // in minutes
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("user_analytics")
+}
+
+// Token price history for charts
+model TokenPriceHistory {
+  id        String   @id @default(cuid())
+  tokenId   String   @index(map("idx_price_token"))
+  timestamp DateTime @default(now()) @index(map("idx_price_timestamp"))
+  price     String   @db.VarChar(78) // BigInt as string
+  supply    String   @default("0") @db.VarChar(78) // BigInt as string
+  volume    String   @default("0") @db.VarChar(78) // BigInt as string
+  marketCap String   @default("0") @db.VarChar(78) // BigInt as string
+
+  // Relations
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([tokenId, timestamp])
+  @@map("token_price_history")
+}
+
+// Token price alerts for users
+model TokenAlert {
+  id        String   @id @default(cuid())
+  userId    String   @index(map("idx_alert_user"))
+  tokenId   String   @index(map("idx_alert_token"))
+  alertType AlertType @index(map("idx_alert_type"))
+
+  // Alert conditions
+  targetPrice     String  @db.VarChar(78) // BigInt as string
+  percentageChange String? // Decimal as string
+  condition        AlertCondition @default(ABOVE) // ABOVE or BELOW
+
+  // Status
+  isActive         Boolean @default(true)
+  isTriggered      Boolean @default(false)
+  triggeredAt      DateTime?
+  lastNotifiedAt  DateTime?
+
+  // Notification settings
+  emailNotification  Boolean @default(true)
+  pushNotification   Boolean @default(false)
+  webhookUrl        String? @db.VarChar(500)
+
+  // Timestamps
+  createdAt DateTime @default(now()) @index(map("idx_alert_created"))
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token    Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([userId, tokenId, alertType])
+  @@map("token_alerts")
+}
+
+// System configuration
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique @index(map("idx_config_key"))
+  value       String
+  description String?  @db.Text
+  category    String   @default("general") @index(map("idx_config_category"))
+  isPublic    Boolean  @default(false)
+  isEditable  Boolean  @default(true)
+  validation  String?  @db.Text // JSON validation rules
+
+  // Audit trail
+  updatedBy   String?  @db.VarChar(42)
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@map("system_config")
+}
+
+// Audit logs for admin actions
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?  @db.VarChar(42) @index(map("idx_audit_user"))
+  action      String   @db.VarChar(100) @index(map("idx_audit_action"))
+  resource    String   @db.VarChar(100) @index(map("idx_audit_resource"))
+  resourceId  String?
+  oldValue    String?  @db.Text
+  newValue    String?  @db.Text
+  ipAddress   String?  @db.VarChar(45) @index(map("idx_audit_ip"))
+  userAgent   String?  @db.Text
+  sessionId   String? @db.VarChar(255)
+
+  // Request details
+  endpoint    String?  @db.VarChar(255)
+  method      String?  @db.VarChar(10)
+  statusCode  Int?
+  duration    Int? // in milliseconds
+
+  // Result
+  success     Boolean  @default(true) @index(map("idx_audit_success"))
+  errorMessage String? @db.Text
+
+  // Timestamps
+  createdAt   DateTime @default(now()) @index(map("idx_audit_created"))
+
+  // Relations
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+// API rate limiting
+model RateLimit {
+  id        String   @id @default(cuid())
+  key       String   @unique @index(map("idx_rate_key"))
+  count     Int      @default(0)
+  windowMs  Int      // Window in milliseconds
+  maxRequests Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime @index(map("idx_rate_expires"))
+
+  @@map("rate_limits")
+}
+
+// Failed login attempts for security
+model FailedLogin {
+  id        String   @id @default(cuid())
+  identifier String  @db.VarChar(255) @index(map("idx_failed_login_identifier")) // email or wallet
+  ipAddress String   @db.VarChar(45) @index(map("idx_failed_login_ip"))
+  userAgent String?  @db.Text
+  reason    String   @db.VarChar(100) // invalid_credentials, account_locked, etc.
+  createdAt DateTime @default(now()) @index(map("idx_failed_login_created"))
+
+  @@map("failed_logins")
+}
+
+// Background job tracking
+model BackgroundJob {
+  id          String   @id @default(cuid())
+  type        String   @index(map("idx_job_type"))
+  status      JobStatus @default(PENDING) @index(map("idx_job_status"))
+  priority    Int      @default(0) @index(map("idx_job_priority"))
+  payload     String?  @db.Text // JSON payload
+  result      String?  @db.Text // JSON result
+  errorMessage String? @db.Text
+  progress    Int      @default(0) // 0-100
+  maxRetries  Int      @default(3)
+  retryCount  Int      @default(0)
+
+  // Timing
+  scheduledAt DateTime @default(now()) @index(map("idx_job_scheduled"))
+  startedAt   DateTime?
+  completedAt DateTime?
+  failedAt    DateTime?
+  nextRetryAt DateTime? @index(map("idx_job_retry"))
+
+  // Metadata
+  createdBy   String?  @db.VarChar(42)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("background_jobs")
+}
+
+// Enums
+enum TransactionType {
+  BUY
+  SELL
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+enum AlertType {
+  PRICE_TARGET
+  PERCENTAGE_CHANGE
+  VOLUME_SPIKE
+  NEW_HIGH
+  NEW_LOW
+}
+
+enum AlertCondition {
+  ABOVE
+  BELOW
+  EQUAL
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}

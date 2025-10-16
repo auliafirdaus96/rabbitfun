@@ -1,0 +1,70 @@
+{
+  "name": "rabbit-launchpad-bnb",
+  "version": "1.0.0",
+  "description": "BSC Smart Contract for Rabbit-style Launchpad",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:unit": "hardhat test test/unit/",
+    "test:integration": "hardhat test test/integration/",
+    "test:coverage": "hardhat coverage",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "deploy:bscTestnet": "hardhat run scripts/deploy.ts --network bscTestnet",
+    "deploy:bscMainnet": "hardhat run scripts/deploy.ts --network bscMainnet",
+    "verify": "hardhat verify --network",
+    "typechain": "hardhat typechain",
+    "clean": "hardhat clean",
+    "type-check": "tsc --noEmit --project tsconfig.test.json",
+    "type-check:watch": "tsc --noEmit --project tsconfig.test.json --watch",
+    "fix-tests": "node fix-tests.js",
+    "validate": "npm run type-check && npm run test:unit",
+    "precommit": "npm run fix-tests && npm run validate",
+    "setup": "npm install && npm run compile && npm run typechain && npm run fix-tests",
+    "audit": "python ../scripts/audit-smart-contracts.py",
+    "audit:quick": "python ../scripts/audit-smart-contracts.py --no-mythril --no-gas",
+    "audit:report": "python ../scripts/generate-audit-summary.py reports/audit",
+    "security:scan": "npm run audit && npm run test:coverage",
+    "validate:security": "npm run type-check && npm run test:unit && npm run audit:quick"
+  },
+  "keywords": [
+    "bsc",
+    "smart-contract",
+    "rabbit",
+    "launchpad",
+    "bonding-curve",
+    "solidity",
+    "typescript",
+    "security",
+    "audit"
+  ],
+  "author": "Rabbit Launchpad Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": ">=9.1.0",
+    "chai": "^4.2.0",
+    "ethers": "^6.4.0",
+    "hardhat": "^2.19.0",
+    "hardhat-gas-reporter": "^1.0.8",
+    "solidity-coverage": "^0.8.1",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.3.0",
+    "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@types/node": "^20.5.0",
+    "dotenv": "^17.2.3"
+  },
+  "directories": {
+    "test": "test"
+  }
+}

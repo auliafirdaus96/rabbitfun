@@ -1,0 +1,419 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Code Quality and Testing
+  test:
+    name: Test and Quality Checks
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: [smartcontract, backend, frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd ${{ matrix.service }}
+          npm ci
+
+      - name: Run linting
+        run: |
+          cd ${{ matrix.service }}
+          npm run lint
+
+      - name: Run type checking
+        run: |
+          cd ${{ matrix.service }}
+          npm run type-check
+        continue-on-error: true
+
+      - name: Run tests
+        run: |
+          cd ${{ matrix.service }}
+          npm run test
+
+      - name: Run blockchain integration tests
+        if: matrix.service == 'backend'
+        run: |
+          cd backend
+          npm run test:blockchain
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
+
+      - name: Generate coverage report
+        run: |
+          cd ${{ matrix.service }}
+          npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ${{ matrix.service }}/coverage/lcov.info
+          flags: ${{ matrix.service }}
+        continue-on-error: true
+
+  # Security Scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run npm audit
+        run: |
+          cd backend && npm audit --audit-level moderate
+          cd ../frontend && npm audit --audit-level moderate
+          cd ../smartcontract && npm audit --audit-level moderate
+        continue-on-error: true
+
+  # Smart Contract Testing and Deployment
+  deploy-contracts:
+    name: Deploy Smart Contracts
+    runs-on: ubuntu-latest
+    needs: [test, security]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: smartcontract/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd smartcontract
+          npm ci
+
+      - name: Run contract tests
+        run: |
+          cd smartcontract
+          npm run test
+
+      - name: Deploy to BSC Testnet
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          cd smartcontract
+          npx hardhat run scripts/deploy-testnet.js --network bsc-testnet
+        env:
+          PRIVATE_KEY: ${{ secrets.BSC_TESTNET_PRIVATE_KEY }}
+          BSCSCAN_API_KEY: ${{ secrets.BSCSCAN_API_KEY }}
+
+      - name: Deploy to BSC Mainnet
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd smartcontract
+          npx hardhat run scripts/deploy-production.js --network bsc-mainnet
+        env:
+          PRIVATE_KEY: ${{ secrets.BSC_MAINNET_PRIVATE_KEY }}
+          BSCSCAN_API_KEY: ${{ secrets.BSCSCAN_API_KEY }}
+
+      - name: Update frontend contracts
+        if: github.ref == 'refs/heads/main'
+        run: |
+          node scripts/update-contract-addresses.js
+        env:
+          TOKEN_ADDRESS: ${{ steps.deploy.outputs.token_address }}
+          LAUNCHPAD_ADDRESS: ${{ steps.deploy.outputs.launchpad_address }}
+
+  # Build and Deploy Backend
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: [test, security, deploy-contracts]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/backend
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to staging
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo "Deploying to staging environment"
+          # Add your staging deployment commands here
+          # kubectl apply -f k8s/staging/
+          # or docker-compose -f docker-compose.staging.yml up -d
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Deploying to production environment"
+          # Add your production deployment commands here
+          # kubectl apply -f k8s/production/
+          # or docker-compose -f docker-compose.production.yml up -d
+
+  # Build and Deploy Frontend
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: [test, security, deploy-backend]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test
+
+      - name: Build application
+        run: |
+          cd frontend
+          npm run build
+        env:
+          VITE_API_URL: ${{ github.ref == 'refs/heads/main' && 'https://api.rabbit-launchpad.com' || 'https://staging-api.rabbit-launchpad.com' }}
+          VITE_WS_URL: ${{ github.ref == 'refs/heads/main' && 'wss://api.rabbit-launchpad.com' || 'wss://staging-api.rabbit-launchpad.com' }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.production
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to staging
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo "Deploying frontend to staging"
+          # Add your staging deployment commands here
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Deploying frontend to production"
+          # Add your production deployment commands here
+
+  # Integration Tests
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Playwright
+        run: npm ci && npx playwright install
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 60
+
+      - name: Run integration tests
+        run: |
+          npx playwright test
+        env:
+          BASE_URL: ${{ github.ref == 'refs/heads/main' && 'https://rabbit-launchpad.com' || 'https://staging.rabbit-launchpad.com' }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+  # Performance Testing
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [integration-test]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://rabbit-launchpad.com
+            https://rabbit-launchpad.com/create
+            https://rabbit-launchpad.com/tokens
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  # Database Migrations
+  migrate-database:
+    name: Database Migrations
+    runs-on: ubuntu-latest
+    needs: [deploy-backend]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run migrations
+        run: |
+          cd backend
+          npm run migrate:prod
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+
+  # Notification
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [integration-test, performance-test]
+    if: always()
+
+    steps:
+      - name: Notify Slack on success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          channel: '#deployments'
+          text: '✅ Deployment to production completed successfully!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          channel: '#deployments'
+          text: '❌ Deployment to production failed!'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send Discord notification
+        uses: Ilshidur/action-discord@master
+        if: always()
+        with:
+          args: |
+            ${{ job.status == 'success' && '✅' || '❌' }} Deployment ${{ job.status == 'success' && 'completed successfully' || 'failed' }}!
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}

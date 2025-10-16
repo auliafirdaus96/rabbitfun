@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run type checking
+npm run check-types
+
+# Run tests
+npm run test:unit
+
+# Run linting
+npm run lint
+
+# Auto-fix test files if needed
+node fix-tests.js

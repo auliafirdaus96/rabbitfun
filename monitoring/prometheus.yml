@@ -1,0 +1,131 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'rabbit-launchpad'
+    environment: 'production'
+
+rule_files:
+  - "rules/*.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Backend Application
+  - job_name: 'rabbit-backend'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - rabbit-launchpad
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: rabbit-backend
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: http
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+
+  # Frontend Application
+  - job_name: 'rabbit-frontend'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - rabbit-launchpad
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: rabbit-frontend
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: http
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
+
+  # Nginx Ingress Controller
+  - job_name: 'nginx-ingress'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - ingress-nginx
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: nginx-ingress-controller
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: prometheus
+
+  # Node Exporter (for system metrics)
+  - job_name: 'node-exporter'
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: node-exporter
+
+  # Kube State Metrics
+  - job_name: 'kube-state-metrics'
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: kube-state-metrics
+
+  # Redis Metrics
+  - job_name: 'redis'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - rabbit-launchpad
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: redis
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: metrics
+
+  # PostgreSQL Metrics
+  - job_name: 'postgres'
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - rabbit-launchpad
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        action: keep
+        regex: postgres-exporter
+      - source_labels: [__meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: metrics
+
+# Alerting rules
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Storage configuration
+remote_write:
+  - url: "http://thanos-receive.default.svc:19291/api/v1/receive"
+    queue_config:
+      max_samples_per_send: 10000
+      max_shards: 200
+      capacity: 25000

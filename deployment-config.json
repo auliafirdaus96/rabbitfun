@@ -1,0 +1,97 @@
+{
+  "project": "Rabbit Launchpad",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "smartContracts": {
+    "bscTestnet": {
+      "address": "0x006Fb00cff2DBC089794FABB415298Cc1b5307Fb",
+      "network": "BSC Testnet",
+      "chainId": 97,
+      "rpcUrl": "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      "explorer": "https://testnet.bscscan.com",
+      "treasuryAddress": "0x4edDe3C550879e3B97D309eC765cb02c5bCf6db7",
+      "pancakeswapRouter": "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
+      "deployedAt": "2025-10-03T15:20:14.358Z",
+      "deploymentTx": "0x2eaf773cc459665c87ace7d57724040310458d140341fc92b0108f78e747df52"
+    },
+    "bscMainnet": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "network": "BSC Mainnet",
+      "chainId": 56,
+      "rpcUrl": "https://bsc-dataseed1.binance.org/",
+      "explorer": "https://bscscan.com",
+      "treasuryAddress": "0x4edDe3C550879e3B97D309eC765cb02c5bCf6db7",
+      "pancakeswapRouter": "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+      "deployedAt": null,
+      "deploymentTx": null,
+      "status": "PENDING_DEPLOYMENT"
+    }
+  },
+  "frontend": {
+    "development": {
+      "url": "http://localhost:5173",
+      "contractAddress": "0x006Fb00cff2DBC089794FABB415298Cc1b5307Fb",
+      "network": "BSC Testnet"
+    },
+    "production": {
+      "url": "https://rabbit-launchpad.vercel.app",
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "network": "BSC Mainnet"
+    }
+  },
+  "backend": {
+    "development": {
+      "url": "http://localhost:3001",
+      "network": "BSC Testnet"
+    },
+    "production": {
+      "url": "https://api.rabbit-launchpad.com",
+      "network": "BSC Mainnet"
+    }
+  },
+  "configuration": {
+    "contractFees": {
+      "createToken": "0.005 BNB",
+      "buyFee": "1.25%",
+      "platformFee": "1%",
+      "creatorFee": "0.25%"
+    },
+    "tokenomics": {
+      "totalSupply": "1,000,000,000 tokens",
+      "initialPrice": "0.00001 BNB",
+      "graduationThreshold": "35 BNB gross raise (achievable target)"
+    },
+    "networks": {
+      "bscMainnet": {
+        "chainId": 56,
+        "rpcUrls": ["https://bsc-dataseed.binance.org/"],
+        "blockExplorerUrls": ["https://bscscan.com/"]
+      },
+      "bscTestnet": {
+        "chainId": 97,
+        "rpcUrls": ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+        "blockExplorerUrls": ["https://testnet.bscscan.com/"]
+      }
+    }
+  },
+  "deploymentChecklist": {
+    "smartContract": {
+      "bscTestnet": "✅ COMPLETED",
+      "bscMainnet": "🔄 PENDING",
+      "verification": "🔄 PENDING"
+    },
+    "frontend": {
+      "development": "✅ COMPLETED",
+      "production": "🔄 PENDING"
+    },
+    "backend": {
+      "development": "✅ COMPLETED",
+      "production": "🔄 PENDING"
+    },
+    "infrastructure": {
+      "database": "🔄 PENDING",
+      "redis": "🔄 PENDING",
+      "monitoring": "🔄 PENDING"
+    }
+  }
+}

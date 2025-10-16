@@ -1,0 +1,211 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Rabbit Launchpad - Application Overview",
+    "tags": ["rabbit-launchpad", "application"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Application Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"rabbit-backend\"}",
+            "legendFormat": "Backend",
+            "refId": "A"
+          },
+          {
+            "expr": "up{job=\"rabbit-frontend\"}",
+            "legendFormat": "Frontend",
+            "refId": "B"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "text": "DOWN",
+                    "color": "red"
+                  },
+                  "1": {
+                    "text": "UP",
+                    "color": "green"
+                  }
+                },
+                "type": "value"
+              }
+            ],
+            "thresholds": {
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "green",
+                  "value": 1
+                }
+              ]
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"rabbit-backend\"}[5m])) by (method)",
+            "legendFormat": "{{method}}",
+            "refId": "A"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests/sec"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Response Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"rabbit-backend\"}[5m]))",
+            "legendFormat": "50th percentile",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"rabbit-backend\"}[5m]))",
+            "legendFormat": "95th percentile",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job=\"rabbit-backend\"}[5m]))",
+            "legendFormat": "99th percentile",
+            "refId": "C"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Response Time (s)"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 4,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"rabbit-backend\",status=~\"4..\"}[5m]) / rate(http_requests_total{job=\"rabbit-backend\"}[5m])",
+            "legendFormat": "4xx errors",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(http_requests_total{job=\"rabbit-backend\",status=~\"5..\"}[5m]) / rate(http_requests_total{job=\"rabbit-backend\"}[5m])",
+            "legendFormat": "5xx errors",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Error Rate",
+            "max": 1,
+            "min": 0
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "id": 5,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "container_memory_usage_bytes{container=\"rabbit-backend\"} / 1024 / 1024",
+            "legendFormat": "Backend",
+            "refId": "A"
+          },
+          {
+            "expr": "container_memory_usage_bytes{container=\"rabbit-frontend\"} / 1024 / 1024",
+            "legendFormat": "Frontend",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Memory (MB)"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        }
+      },
+      {
+        "id": 6,
+        "title": "CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container=\"rabbit-backend\"}[5m]) * 100",
+            "legendFormat": "Backend",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container=\"rabbit-frontend\"}[5m]) * 100",
+            "legendFormat": "Frontend",
+            "refId": "B"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "CPU Usage (%)"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        }
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

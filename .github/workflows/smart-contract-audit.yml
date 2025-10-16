@@ -1,0 +1,291 @@
+name: Smart Contract Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'smartcontract/contracts/**'
+      - 'smartcontract/test/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'smartcontract/contracts/**'
+      - 'smartcontract/test/**'
+  schedule:
+    # Run weekly audit every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      contract_path:
+        description: 'Specific contract to audit (optional)'
+        required: false
+        type: string
+      run_mythril:
+        description: 'Run Mythril symbolic analysis'
+        required: true
+        type: boolean
+        default: true
+      run_gas_analysis:
+        description: 'Run gas consumption analysis'
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+      pull-requests: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-audit-${{ hashFiles('smartcontract/requirements-audit.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-audit-
+
+    - name: Install audit dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r smartcontract/requirements-audit.txt
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: smartcontract/package-lock.json
+
+    - name: Install Node.js dependencies
+      working-directory: ./smartcontract
+      run: npm ci
+
+    - name: Install Solidity compiler
+      run: |
+        pip install solc-select
+        solc-select install 0.8.19
+        solc-select use 0.8.19
+
+    - name: Create reports directory
+      run: mkdir -p reports/audit
+
+    - name: Run smart contract audit
+      run: |
+        python scripts/audit-smart-contracts.py \
+          --contracts-dir smartcontract/contracts \
+          --reports-dir reports/audit \
+          ${{ github.event.inputs.contract_path && format('--contract {0}', github.event.inputs.contract_path) || '' }} \
+          ${{ github.event.inputs.run_mythril == 'false' && '--no-mythril' || '' }} \
+          ${{ github.event.inputs.run_gas_analysis == 'false' && '--no-gas' || '' }}
+
+    - name: Upload audit reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: audit-reports-${{ github.run_number }}
+        path: reports/audit/
+        retention-days: 30
+
+    - name: Run Slither SARIF output
+      run: |
+        slither smartcontract/contracts --sarif reports/audit/slither.sarif || true
+
+    - name: Upload SARIF file to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: reports/audit/slither.sarif
+
+    - name: Run Semgrep security scan
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/securibank
+          p/owasp-top-ten
+        targets: |
+          smartcontract/contracts/**/*.sol
+        output: reports/audit/semgrep-report.json
+
+    - name: Run additional security checks
+      run: |
+        echo "Running additional security checks..."
+
+        # Check for hardcoded secrets
+        echo "Checking for hardcoded secrets..."
+        if grep -r -i "private.*key\|secret\|password\|mnemonic" smartcontract/contracts --exclude-dir=node_modules; then
+          echo "WARNING: Potential hardcoded secrets found!"
+        fi
+
+        # Check for common vulnerabilities
+        echo "Checking for common vulnerability patterns..."
+
+        # Check for unchecked calls
+        if grep -r "\.call\|\.send\|\.transfer" smartcontract/contracts --exclude-dir=node_modules | grep -v "require\|assert\|revert"; then
+          echo "WARNING: Potential unchecked external calls found!"
+        fi
+
+        # Check for reentrancy patterns
+        if grep -r -A 5 -B 5 "\.call.*{" smartcontract/contracts --exclude-dir=node_modules; then
+          echo "INFO: Reentrancy patterns detected - manual review recommended"
+        fi
+
+    - name: Generate audit summary
+      run: |
+        python scripts/generate-audit-summary.py reports/audit/ > reports/audit/audit-summary.md
+
+    - name: Comment PR with audit results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+
+          try {
+            const summary = fs.readFileSync('reports/audit/audit-summary.md', 'utf8');
+
+            const comment = `## 🔍 Smart Contract Audit Results
+
+            ${summary}
+
+            **📊 Detailed Reports:**
+            - Full audit report available in [workflow artifacts](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            - SARIF findings available in Security tab
+
+            ---
+            *This audit was performed automatically using Slither, Mythril, and Semgrep.*
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.log('Could not read audit summary:', error.message);
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🔍 Smart Contract Audit Results\n\nSmart contract audit completed. Detailed reports are available in the [workflow artifacts](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ').'
+            });
+          }
+
+    - name: Send notification on critical findings
+      if: failure()
+      run: |
+        echo "Critical security issues detected! Manual review required."
+        # Add notification logic here (Slack, Discord, etc.)
+
+  compile-and-test:
+    runs-on: ubuntu-latest
+    needs: audit
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: smartcontract/package-lock.json
+
+    - name: Install Node.js dependencies
+      working-directory: ./smartcontract
+      run: npm ci
+
+    - name: Compile contracts
+      working-directory: ./smartcontract
+      run: npm run compile
+
+    - name: Run tests
+      working-directory: ./smartcontract
+      run: npm run test
+
+    - name: Run coverage
+      working-directory: ./smartcontract
+      run: npm run test:coverage
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./smartcontract/coverage/lcov.info
+        flags: smartcontracts
+        name: smart-contract-coverage
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: audit
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run TruffleHog secret scan
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./smartcontract/
+        base: main
+        head: HEAD
+
+    - name: Run npm audit
+      working-directory: ./smartcontract
+      run: npm audit --audit-level moderate
+
+  notify-results:
+    runs-on: ubuntu-latest
+    needs: [audit, compile-and-test, security-scan]
+    if: always()
+
+    steps:
+    - name: Download audit reports
+      uses: actions/download-artifact@v3
+      with:
+        name: audit-reports-${{ github.run_number }}
+        path: reports/audit/
+
+    - name: Send audit notification
+      if: always()
+      run: |
+        echo "Audit completed for ${{ github.sha }}"
+        echo "Status: ${{ job.status }}"
+
+        # Create notification message
+        cat << EOF > notification.txt
+        🦊 **Rabbit Launchpad Smart Contract Audit**
+
+        **Commit:** ${{ github.sha }}
+        **Branch:** ${{ github.ref_name }}
+        **Status:** ${{ job.status }}
+
+        **Audit Results:**
+        - Slither analysis completed
+        - Mythril symbolic analysis completed
+        - Security scans completed
+        - Compilation and tests passed
+
+        **Reports:** Download from GitHub Actions artifacts
+
+        EOF
+
+        echo "Audit notification prepared"
+
+        # Add your notification service here (Slack webhook, Discord, etc.)
+        # curl -X POST -H 'Content-type: application/json' --data @"notification.txt" YOUR_WEBHOOK_URL

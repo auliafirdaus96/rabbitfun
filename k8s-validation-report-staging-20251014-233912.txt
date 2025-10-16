@@ -1,0 +1,32 @@
+Rabbit Launchpad K8S Manifests Validation Report
+=================================================
+Environment: staging
+Timestamp: 14 Oct 2025 23:39:12
+Namespace: rabbit-launchpad
+
+=== Manifest Files ===
+k8s/staging/backend-deployment.yaml
+k8s/staging/configmap.yaml
+k8s/staging/frontend-deployment.yaml
+k8s/staging/ingress.yaml
+k8s/staging/namespace.yaml
+k8s/staging/secrets.yaml
+
+=== Configuration Summary ===
+Namespace: rabbit-launchpad
+Environment: staging
+Backend Replicas: strategy:
+Frontend Replicas: strategy:
+NODE_ENV: "staging"
+LOG_LEVEL: "debug"
+
+=== Ingress Hosts ===
+- host:
+- host:
+- host:
+- host:
+
+=== Security Configuration ===
+TLS Configured: Yes
+Resource Limits: Yes
+Health Probes: Yes

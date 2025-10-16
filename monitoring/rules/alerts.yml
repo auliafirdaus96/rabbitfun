@@ -1,0 +1,162 @@
+groups:
+  - name: rabbit-launchpad.rules
+    rules:
+      # Application health alerts
+      - alert: BackendDown
+        expr: up{job="rabbit-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: "Backend service is down"
+          description: "Backend service has been down for more than 1 minute."
+
+      - alert: FrontendDown
+        expr: up{job="rabbit-frontend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: frontend
+        annotations:
+          summary: "Frontend service is down"
+          description: "Frontend service has been down for more than 1 minute."
+
+      # Performance alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="rabbit-backend"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s for more than 5 minutes."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job="rabbit-backend",status=~"5.."}[5m]) / rate(http_requests_total{job="rabbit-backend"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for more than 5 minutes."
+
+      # Resource usage alerts
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{container="rabbit-backend"}[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% for more than 10 minutes."
+
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes{container="rabbit-backend"} / container_spec_memory_limit_bytes * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value }}% for more than 10 minutes."
+
+      # Database alerts
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "High database connections"
+          description: "Database has {{ $value }} active connections."
+
+      - alert: DatabaseDiskSpaceHigh
+        expr: (pg_database_size_bytes / 1024 / 1024 / 1024) > 80
+        for: 15m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "Database disk space is high"
+          description: "Database size is {{ $value }}GB."
+
+      # Redis alerts
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis memory usage is {{ $value }}%."
+
+      # Pod restart alerts
+      - alert: PodRestartHigh
+        expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod restarting frequently"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in the last 15 minutes."
+
+      # Ingress alerts
+      - alert: IngressHigh5xxRate
+        expr: sum(rate(nginx_ingress_controller_requests{status=~"5.."}[5m])) / sum(rate(nginx_ingress_controller_requests[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: ingress
+        annotations:
+          summary: "High 5xx rate in ingress"
+          description: "Ingress 5xx rate is {{ $value | humanizePercentage }}."
+
+      # SSL certificate alerts
+      - alert: SSLCertificateExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+        for: 1h
+        labels:
+          severity: warning
+          service: ssl
+        annotations:
+          summary: "SSL certificate expiring soon"
+          description: "SSL certificate for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}."
+
+  - name: business.rules
+    rules:
+      # Business metrics alerts
+      - alert: LowUserActivity
+        expr: rate(http_requests_total{job="rabbit-backend",endpoint="/api/users/profile"}[1h]) < 10
+        for: 30m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "Low user activity detected"
+          description: "User activity has been low for the past 30 minutes."
+
+      - alert: HighTransactionVolume
+        expr: rate(http_requests_total{job="rabbit-backend",endpoint=~"/api/.*"}[5m]) > 1000
+        for: 2m
+        labels:
+          severity: info
+          service: business
+        annotations:
+          summary: "High transaction volume"
+          description: "Transaction volume is {{ $value }} requests/second."
+
+      - alert: SmartContractError
+        expr: rate(http_requests_total{job="rabbit-backend",endpoint="/api/contract",status=~"5.."}[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: smart-contract
+        annotations:
+          summary: "Smart contract errors detected"
+          description: "Smart contract error rate is {{ $value | humanizePercentage }}."

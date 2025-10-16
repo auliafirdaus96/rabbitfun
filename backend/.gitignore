@@ -1,0 +1,560 @@
+# ==============================================
+# Ahiru Launchpad - Backend .gitignore
+# ==============================================
+
+# ---------- System & OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+
+# ---------- IDE & Editors ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- Dependencies ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+lerna-debug.log*
+jspm_packages/
+
+# ---------- Environment Variables ----------
+# CRITICAL: Never commit environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.development
+.env.test
+.env.staging
+.env.production
+
+# ---------- Build & Output ----------
+dist/
+build/
+out/
+.output/
+.next/
+.nuxt/
+
+# ---------- Database ----------
+# CRITICAL: Never commit database files
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-journal
+dump.rdb
+*.db-shm
+*.db-wal
+
+# ---------- Prisma Generated Files ----------
+# Generated Prisma client (re-generate on install)
+/src/generated/
+/prisma/migrations/
+!prisma/migrations/.gitkeep
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+pnpm-error.log*
+error.log
+debug.log
+warn.log
+access.log
+combined.log
+
+# ---------- Runtime Data ----------
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.lock
+.lock-wscript
+
+# ---------- Cache ----------
+.cache/
+.npm
+.yarn
+.pnpm
+pnpm-store.yaml
+.eslintcache
+.stylelintcache
+.node_repl_history
+.tsbuildinfo
+.parcel-cache/
+
+# ---------- Coverage & Testing ----------
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+scout/
+test-coverage/
+.c8-coverage/
+junit.xml
+
+# ---------- Package Manager ----------
+*.tgz
+.yarn-integrity
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+package-lock.json.bak
+node_modules/.package-lock.json
+
+# ---------- TypeScript ----------
+*.tsbuildinfo
+
+# ---------- Docker ----------
+.dockerignore
+Dockerfile.dev
+docker-compose.override.yml
+docker-compose.prod.yml
+
+# ---------- Kubernetes ----------
+*.yaml.local
+*.yaml.dev
+*.yaml.staging
+*.yaml.prod
+
+# ---------- Monitoring & Analytics ----------
+*.mp3
+*.wav
+*.pdf
+*.prof
+
+# ---------- Documentation ----------
+docs/build/
+site/
+*.md.bak
+
+# ---------- Backup Files ----------
+*.bak
+*.backup
+*.old
+*.tmp
+
+# ---------- API & Security ----------
+# CRITICAL: Never commit API keys or certificates
+api-keys/
+api-keys/*
+certificates/
+certificates/*
+*.pem
+*.key
+*.p12
+*.crt
+*.pfx
+secrets/
+secrets/*
+config/secrets.json
+config/local.json
+
+# ---------- Database Backups ----------
+db-backups/
+database-backups/
+backup-*.sql
+*.sql.backup
+
+# ---------- Development Tools ----------
+.prettierignore
+.stylelintcache
+.postcssrc.json
+
+# ---------- Upload & Storage ----------
+uploads/
+storage/
+temp-uploads/
+user-uploads/
+
+# ---------- Temporary Files ----------
+tmp/
+temp/
+.tmp/
+.temp/
+
+# ---------- Backend Specific ----------
+# Session storage
+sessions/
+session-store/
+
+# Redis dump (except for template files)
+dump.rdb
+redis-dump/
+
+# PM2 configuration (keep template files)
+ecosystem.config.js
+ecosystem.config.json
+pm2.config.js
+
+# Nginx configuration
+nginx.conf.local
+nginx-dev.conf
+
+# SSL certificates (never commit)
+ssl/
+certificates/
+*.crt
+*.key
+*.pem
+
+# Monitoring data
+monitoring/
+metrics/
+performance-data/
+
+# Log rotation
+logrotate/
+*.log.*
+
+# Health check files
+health-checks/
+status-checks/
+
+# Rate limiting data
+rate-limits/
+
+# Caching data
+cache-data/
+temp-cache/
+
+# Email templates (keep only templates)
+email-templates/sent/
+email-logs/
+
+# Authentication data
+auth-data/
+login-attempts/
+
+# API documentation build
+api-docs/build/
+swagger/build/
+
+# Load balancer config
+load-balancer.local
+haproxy.local
+
+# CI/CD artifacts
+.github/workflows/artifacts/
+ci-artifacts/
+
+# Development environment
+dev-environment/
+test-environment/
+
+# Configuration backups
+config-backups/
+
+# Database migrations temp
+migrations-temp/
+
+# Security scan results
+security-scans/
+vulnerability-reports/
+
+# Performance testing
+performance-test/
+load-test/
+
+# Environment-specific configs
+config/development/
+config/production/
+config/staging/
+
+# ---------- Additional Security & Modern Development ----------
+# Claude Code and AI assistants
+.claude/
+claude-session-history/
+ai-assistant-cache/
+llm-cache/
+
+# Docker and Container Security
+.dockerbuild/
+container-logs/
+docker-override.local.yml
+
+# Kubernetes Secrets and Config
+secrets/
+*.secrets.yaml
+*.secrets.yml
+charts/values.local.yaml
+charts/values.dev.yaml
+charts/values.staging.yaml
+
+# Terraform Infrastructure
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+.terraformrc
+
+# Ansible Configuration
+ansible-vault/
+ansible/inventory.local
+ansible/group_vars/local/
+ansible/host_vars/local/
+
+# Monitoring and Observability
+prometheus-data/
+grafana-data/
+alertmanager-data/
+loki-data/
+tempo-data/
+jaeger-data/
+
+# Logging and Metrics
+elasticsearch-data/
+kibana-data/
+logstash-data/
+fluentd-logs/
+
+# CI/CD Pipeline
+.github/workflows/temp/
+.gitlab-ci-local/
+bitbucket-pipelines.local.yml
+ci-artifacts/
+
+# Performance and Load Testing
+k6-results/
+artillery-results/
+gatling-results/
+jmeter-results/
+locust-results/
+
+# Security Scanning
+snyk-report.json
+trivy-results.json
+dependency-check-report.html
+npm-audit-report.json
+owasp-zap-report.html
+burp-report.html
+
+# Database Management Tools
+pgadmin-data/
+dbeaver-data/
+data-grip/
+tableplus-data/
+navicat-data/
+
+# API Documentation and Testing
+postman-environments/
+insomnia-environment.json
+swagger-codegen/
+api-docs/local/
+openapi-generator/
+
+# SSL Certificates and Keys (Development)
+ssl-local/
+certs-local/
+*.local.crt
+*.local.key
+*.local.pem
+ca-certs-local/
+
+# Backup and Recovery
+automated-backups/
+manual-backups/
+backup-schedules/
+restore-scripts/
+
+# Rate Limiting and Security
+rate-limit-data/
+security-logs/
+firewall-rules.local/
+ip-whitelist.local/
+
+# Caching and Storage
+redis-backups/
+memcached-dumps/
+cache-snapshots/
+storage-backups/
+
+# Message Queues
+rabbitmq-data/
+kafka-data/
+nats-data/
+eventstore-data/
+
+# Email Services
+email-logs/
+email-queue/
+template-backups/
+
+# Authentication and Authorization
+jwt-secrets/
+oauth-secrets/
+saml-config.local/
+auth-logs/
+
+# Analytics and Monitoring
+application-metrics/
+performance-metrics/
+error-traces/
+health-check-logs/
+
+# Development Tools
+sonar-project.properties
+codeclimate.json
+codecov.yml.local
+.gitpod/
+
+# Container Orchestration
+docker-compose.override.local.yml
+docker-compose.test.yml
+docker-compose.prod.yml
+
+# Microservices Architecture
+service-mesh-config/
+api-gateway-config/
+service-discovery/
+
+# Cloud Provider Specific
+aws-credentials/
+azure-credentials/
+gcp-credentials/
+digitalocean-credentials/
+
+# Serverless Functions
+netlify/functions/
+vercel/functions/
+cloudflare-workers/
+aws-lambda-build/
+
+# API Gateway and Load Balancer
+nginx-config.local/
+haproxy-config.local/
+traefik-config.local/
+envoy-config.local/
+
+# Database Migration Tools
+flyway-temp/
+liquibase-backups/
+migration-scripts-temp/
+
+# Development Environment
+dev-scripts/
+local-setup/
+development-environment/
+
+# Archive and Compressed Files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.bz2
+*.xz
+backup-*
+archive-*
+
+# Temporary Files
+temp-*
+.tmp-*
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*~
+
+# License Compliance
+license-report/
+third-party-licenses/
+FOSSA-report/
+
+# Documentation Build
+docs/_build/
+docs/.doctrees/
+site/
+
+# IDE Specific - Additional
+.vscode-insiders/
+.idea-ultimate/
+*.sublime-project
+*.sublime-workspace
+
+# OS Specific - Additional
+# macOS
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db:encryptable
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Package Managers - Additional
+.pnpm-debug.log*
+.yarn-debug.log*
+.yarn-error.log*
+.lerna-debug.log*
+
+# Build Tools - Additional
+.webpack-cache/
+.parcel-cache/
+.esbuild-cache/
+.rollup.cache/
+
+# Testing Frameworks - Additional
+.cypress-cache/
+.playwright-cache/
+testcafe-results/
+wdio-reports/
+
+# Important files to keep (exceptions)
+!.env.example
+!.github/workflows/deploy.yml
+!Dockerfile
+!docker-compose.yml
+!README.md
+!package.json
+!package-lock.json
+!tsconfig.json
+!prisma/schema.prisma
+!backend/prisma/migrations/
+!backend/prisma/migrations/.gitkeep

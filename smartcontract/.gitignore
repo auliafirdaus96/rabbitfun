@@ -1,0 +1,547 @@
+# ==============================================
+# Ahiru Launchpad - Smart Contract .gitignore
+# ==============================================
+
+# ---------- System & OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+
+# ---------- IDE & Editors ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- Dependencies ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+lerna-debug.log*
+jspm_packages/
+
+# ---------- Environment Variables ----------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.development
+.env.test
+.env.staging
+.env.production
+
+# ---------- Build & Cache ----------
+cache/
+artifacts/
+typechain-types/
+typechain/
+dist/
+build/
+out/
+.client/dist/
+.client/.next/
+.client/out/
+client/src/abis/
+.deployment_cache/
+
+# ---------- Hardhat Specific ----------
+hardhat.config.js.bak
+hardhat.config.ts.bak
+.hardhat-node-data/
+.anvil/
+anvil-db/
+
+# ---------- Foundry Specific ----------
+lib/
+out/
+foundry.toml
+broadcast/
+
+# ---------- Truffle Specific ----------
+build/contracts/
+build/deployments/
+build/
+
+# ---------- Brownie Specific ----------
+brownie/
+build/
+
+# ---------- Ganache Specific ----------
+ganache-records/
+ganache-keys/
+ganache-data/
+
+# ---------- Security & Private Keys ----------
+# CRITICAL: Never commit private keys or sensitive data
+private-keys/
+private-keys/*
+keys/
+keys/*
+wallets/
+wallets/*
+secrets/
+secrets/*
+keystore/
+keystore/*
+mnemonics.txt
+*.pem
+*.key
+*.p12
+*.crt
+*.pfx
+*.pem
+*.json.enc
+.env.private
+secrets.json
+wallet.json
+test-wallets.json
+deploy-wallets.json
+api-keys.txt
+verification-keys/
+etherscan-keys.txt
+blockscout-keys.txt
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+debug.log
+error.log
+test.log
+
+# ---------- Runtime Data ----------
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.lock
+
+# ---------- Coverage & Testing ----------
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+test-coverage/
+.c8-coverage/
+coverage/
+junit.xml
+lcov.info
+
+# ---------- Cache ----------
+.npm
+.yarn
+.pnpm
+pnpm-store.yaml
+.eslintcache
+.stylelintcache
+.node_repl_history
+.tsbuildinfo
+.cache/
+.parcel-cache/
+
+# ---------- Package Manager ----------
+*.tgz
+.yarn-integrity
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+package-lock.json.bak
+node_modules/.package-lock.json
+
+# ---------- Gas & Performance ----------
+gas-report.txt
+gasReporterOutput.json
+*.prof
+*.trace
+
+# ---------- Security Analysis ----------
+slither-results.json
+slither-db.json
+mythril/
+audit-reports/
+*.pdf
+security-audit.txt
+vulnerability-reports/
+
+# ---------- Debug & Development ----------
+debug/
+trace/
+*.trace
+test/
+scripts/
+broadcast/
+.tmp/
+*.tmp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+~*
+
+# ---------- Documentation ----------
+docs/build/
+site/
+*.md.bak
+CHANGELOG.md.bak
+
+# ---------- Fork Testing ----------
+.foresight/
+fork-testing-data/
+
+# ---------- Local Blockchain ----------
+local-chain/
+test-chain/
+
+# ---------- Development Tools ----------
+.prettierignore
+.stylelintcache
+.postcssrc.json
+
+# ---------- OS Generated ----------
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------- Specific to Smart Contract Development ----------
+# Contract verification files
+verification-cache/
+verify-cache/
+
+# Test configuration files
+test-config.json
+local-test.json
+hardhat-local.config.js
+
+# Deployment scripts temporary files
+scripts/deploy-temp/
+scripts/verify-temp/
+
+# Local development data
+dev-data/
+test-data/
+
+# Security scan temp files
+security-scan-temp/
+slither-temp/
+
+# Gas optimization reports
+gas-optimization/
+gas-reports/
+
+# Contract interaction logs
+interaction-logs/
+transaction-logs/
+
+# Development wallets and test accounts
+dev-wallets/
+test-accounts/
+
+# ABI exports (except in node_modules)
+abis/
+exported-abis/
+frontend-abis/
+
+# Migration and deployment backups
+migration-backups/
+deployment-backups/
+
+# Performance testing data
+performance-test/
+load-test/
+
+# CI/CD artifacts
+.github/workflows/artifacts/
+ci-artifacts/
+
+# Environment-specific scripts
+scripts/local/
+scripts/dev/
+scripts/test/
+
+# Temporary deployment files
+deploy-temp/
+temp-deploy/
+
+# Blockchain explorer integration
+explorer-data/
+blockchain-cache/
+
+# Research and development
+contracts/research/
+contracts/experimental/
+contracts/prototypes/
+
+# Security audit drafts
+audit-drafts/
+security-review/
+
+# ---------- Additional Security & Modern Development ----------
+# Claude Code and AI assistants
+.claude/
+claude-session-history/
+ai-assistant-cache/
+llm-cache/
+
+# Development Framework Security
+hardhat-local.config.ts
+foundry-local.toml
+truffle-local.js
+brownie-local.yaml
+
+# Security and Audit Tools
+mythril-results/
+slither-results-detailed/
+securing-results/
+quilibrium-results/
+trailofbits-report/
+certik-audit/
+openzeppelin-contracts-upgradeable-security/
+
+# Blockchain Explorers and Analytics
+etherscan-local.json
+polygonscan-local.json
+bscscan-local.json
+arbiscan-local.json
+dune-analytics-local.json
+flipside-crypto-local.json
+
+# Development Networks and Forks
+local-forks/
+anvil-forks/
+ganache-forks/
+hardhat-forks/
+testnet-forks/
+mainnet-forks/
+
+# Smart Contract Development Tools
+remix-ide-cache/
+solidity-coverage/
+tenderly-local/
+ape-local/
+brownie-local/
+
+# DeFi and Protocol Integration
+uniswap-v3-data/
+sushiswap-data/
+pancakeswap-data/
+curve-data/
+aave-data/
+compound-data/
+
+# Gas Optimization and Analysis
+gas-optimization-reports/
+gas-profile-data/
+gas-tracker/
+eth-gas-reporter/
+foundry-gas-report/
+
+# Contract Verification and Deployment
+verification-temp/
+deploy-scripts-temp/
+broadcast-temp/
+deploy-logs/
+verification-logs/
+
+# Private Key and Wallet Security (Additional)
+hardware-wallet-data/
+ledger-backups/
+trezor-backups/
+metamask-backups/
+wallet-connect-secrets/
+
+# Multi-sig and Governance
+gnosis-safe-data/
+multisig-transactions/
+governance-proposals/
+dao-proposals/
+
+# Token and NFT Development
+nft-metadata/
+token-metadata/
+metadata-schemas/
+ipfs-local/
+arweave-local/
+
+# Layer 2 and Scaling Solutions
+optimism-data/
+arbitrum-data/
+polygon-data/
+base-data/
+zksync-data/
+starknet-data/
+
+# Cross-chain and Bridge Development
+bridge-data/
+crosschain-transactions/
+layerzero-data/
+wormhole-data/
+ccip-data/
+
+# Oracles and Price Feeds
+chainlink-data/
+band-protocol-data/
+pyth-network-data/
+redstone-data/
+api3-data/
+
+# Security Audit and Compliance
+audit-reports-detailed/
+security-findings/
+vulnerability-tracking/
+penetration-testing/
+compliance-reports/
+
+# Development and Testing Scripts
+scripts/local-*
+scripts/test-*
+scripts/dev-*
+scripts/temp-*
+
+# Environment Configuration
+.env.audit
+.env.security
+.env.testnet
+.env.mainnet
+.env.staging
+
+# Contract Libraries and Dependencies
+lib-temp/
+node_modules_backup/
+dependency-cache/
+
+# Blockchain Data and Analytics
+blockchain-data/
+onchain-data/
+transaction-analysis/
+wallet-analysis/
+
+# Smart Contract Documentation
+docs-generated/
+api-docs-generated/
+abi-documentation/
+developer-docs/
+
+# Performance and Monitoring
+contract-performance/
+gas-usage-tracking/
+execution-tracking/
+event-monitoring/
+
+# CI/CD for Smart Contracts
+.github/workflows/temp/
+.gitlab-ci-local/
+foundry-toolchain/
+hardhat-toolchain/
+
+# Backup and Archive Files
+contract-backups/
+deployment-backups/
+migration-backups/
+archive-*
+
+# Temporary Files and Directories
+temp-*
+.tmp-*
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*~
+
+# License and Legal
+license-compliance/
+legal-documents/
+terms-and-conditions/
+privacy-policy/
+
+# IDE and Development Tools
+.vscode-insiders/
+.idea-ultimate/
+*.sublime-project
+*.sublime-workspace
+.remix-ide/
+
+# OS Specific - Additional
+# macOS
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db:encryptable
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Package Managers - Additional
+.pnpm-debug.log*
+.yarn-debug.log*
+.yarn-error.log*
+.lerna-debug.log*
+
+# Build Tools - Additional
+.webpack-cache/
+.parcel-cache/
+.esbuild-cache/
+.rollup.cache/
+
+# Testing Frameworks - Additional
+.cypress-cache/
+.playwright-cache/
+testcafe-results/
+wdio-reports/
+
+# Important files to keep (exceptions)
+!.env.example
+!hardhat.config.js
+!hardhat.config.ts
+!foundry.toml
+!remix.workspace.json
+!README.md
+!package.json
+!package-lock.json
+!contracts/
+!scripts/
+!test/
+!.github/workflows/deploy.yml

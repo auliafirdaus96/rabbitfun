@@ -1,0 +1,592 @@
+# ==============================================
+# Ahiru Launchpad - Comprehensive .gitignore
+# ==============================================
+
+# ---------- System & OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+desktop.ini
+
+# ---------- IDE & Editors ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/uiDesigner.xml
+.idea/shelf
+.idea/contentModel.xml
+
+# ---------- Dependencies ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+lerna-debug.log*
+jspm_packages/
+
+# ---------- Build Outputs ----------
+dist/
+build/
+out/
+.output/
+dist-ssr/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ---------- Environment Variables ----------
+# CRITICAL: Never commit environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.development
+.env.test
+.env.staging
+.env.production
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+pnpm-error.log*
+log.txt
+error.log
+debug.log
+warn.log
+
+# ---------- Runtime Data ----------
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.lock
+.lock-wscript
+
+# ---------- Cache ----------
+.cache/
+.npm
+.yarn
+.pnpm
+pnpm-store.yaml
+.eslintcache
+.stylelintcache
+.node_repl_history
+.tsbuildinfo
+
+# ---------- Coverage & Testing ----------
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+scout/
+test-coverage/
+.c8-coverage/
+coverage/
+junit.xml
+test-results.xml
+playwright-report/
+e2e/videos/
+e2e/screenshots/
+
+# ---------- Package Manager ----------
+*.tgz
+.yarn-integrity
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.yarn/pnpmpatch
+package-lock.json.bak
+node_modules/.package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# ---------- Database ----------
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-journal
+dump.rdb
+*.db-shm
+*.db-wal
+
+# ---------- Blockchain & Smart Contracts ----------
+# CRITICAL: Security sensitive files - NEVER commit these
+private-keys/
+private-keys/*
+keys/
+keys/*
+wallets/
+wallets/*
+secrets/
+secrets/*
+keystore/
+keystore/*
+mnemonics.txt
+*.pem
+*.key
+*.p12
+*.crt
+*.pfx
+*.pem
+*.json.enc
+*.env.private
+secrets.json
+wallet.json
+test-wallets.json
+deploy-wallets.json
+api-keys.txt
+verification-keys/
+etherscan-keys.txt
+blockscout-keys.txt
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+typechain/
+deployments/
+deployments.cache/
+hardhat.config.js.bak
+hardhat.config.ts.bak
+hardhat-node-data/
+.anvil/
+anvil-db/
+
+# Foundry
+lib/
+out/
+foundry.toml
+broadcast/
+
+# Truffle
+build/contracts/
+build/deployments/
+.client/build/
+client/src/abis/
+.deployment_cache/
+
+# Brownie
+brownie/
+build/
+
+# Ganache
+ganache-records/
+ganache-keys/
+ganache-data/
+
+# ---------- Gas & Performance ----------
+gas-report.txt
+gasReporterOutput.json
+*.prof
+*.trace
+
+# ---------- Security & Analysis ----------
+slither-results.json
+slither-db.json
+mythril/
+audit-reports/
+*.pdf
+security-audit.txt
+vulnerability-reports/
+
+# ---------- Documentation ----------
+docs/build/
+site/
+*.md.bak
+CHANGELOG.md.bak
+
+# ---------- Temporary Files ----------
+tmp/
+temp/
+.tmp/
+.temp/
+*.tmp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+~*
+
+# ---------- Deployment & CI/CD ----------
+.dockerignore
+Dockerfile.dev
+docker-compose.override.yml
+docker-compose.prod.yml
+vercel.json
+.netlify/
+firebase.json
+wrangler.toml
+
+# ---------- Kubernetes & Infrastructure ----------
+*.yaml.local
+*.yaml.dev
+*.yaml.staging
+*.yaml.prod
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+.terraformrc
+
+# ---------- Monitoring & Analytics ----------
+*.mp3
+*.wav
+*.pdf
+monitoring/
+metrics/
+.dat
+
+# ---------- Platform Specific ----------
+.vercel/
+.local/
+
+# ---------- Development Tools ----------
+.prettierignore
+.stylelintcache
+.postcssrc.json
+.eslintcache
+
+# ---------- OS Generated ----------
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# ---------- Frontend Specific ----------
+# Source maps
+*.js.map
+*.css.map
+*.map
+
+# React build output
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/out/
+
+# Storybook
+storybook-static/
+.out
+.storybook-out
+
+# Bundle analysis
+bundle-analyzer/
+bundle-report/
+webpack-bundle-analyzer/
+
+# Lighthouse reports
+lighthouse-reports/
+.performance/
+
+# ---------- Backend Specific ----------
+# Prisma generated files (except migrations)
+backend/src/generated/
+
+# Database backups
+db-backups/
+database-backups/
+backup-*.sql
+*.sql.backup
+
+# Upload & storage
+uploads/
+storage/
+temp-uploads/
+user-uploads/
+
+# Session storage
+sessions/
+session-store/
+
+# PM2 configuration
+ecosystem.config.js
+ecosystem.config.json
+pm2.config.js
+
+# SSL certificates (never commit)
+ssl/
+certificates/
+*.crt
+*.key
+*.pem
+
+# API documentation build
+api-docs/build/
+swagger/build/
+
+# ---------- Smart Contract Specific ----------
+# Contract verification files
+verification-cache/
+verify-cache/
+
+# Test configuration files
+test-config.json
+local-test.json
+hardhat-local.config.js
+
+# Deployment scripts temporary files
+scripts/deploy-temp/
+scripts/verify-temp/
+
+# Local development data
+dev-data/
+test-data/
+
+# Security scan temp files
+security-scan-temp/
+slither-temp/
+
+# Gas optimization reports
+gas-optimization/
+gas-reports/
+
+# Contract interaction logs
+interaction-logs/
+transaction-logs/
+
+# Development wallets and test accounts
+dev-wallets/
+test-accounts/
+
+# ABI exports (except in node_modules)
+abis/
+exported-abis/
+frontend-abis/
+
+# Migration and deployment backups
+migration-backups/
+deployment-backups/
+
+# Performance testing data
+performance-test/
+load-test/
+
+# CI/CD artifacts
+.github/workflows/artifacts/
+ci-artifacts/
+
+# Environment-specific scripts
+scripts/local/
+scripts/dev/
+scripts/test/
+
+# Temporary deployment files
+deploy-temp/
+temp-deploy/
+
+# Blockchain explorer integration
+explorer-data/
+blockchain-cache/
+
+# Research and development
+contracts/research/
+contracts/experimental/
+contracts/prototypes/
+
+# Security audit drafts
+audit-drafts/
+security-review/
+
+# ---------- Additional Modern Security & Development ----------
+# Claude Code and AI assistants
+.claude/
+claude-session-history/
+ai-assistant-cache/
+llm-cache/
+
+# AI/ML Development
+ml-models/
+model-training/
+tensorboard-logs/
+jupyter-checkpoints/
+
+# Advanced Security
+security-audit-drafts/
+penetration-testing-reports/
+vulnerability-assessments/
+threat-models/
+security-policies/
+
+# Compliance and Legal
+gdpr-compliance/
+hipaa-compliance/
+sox-compliance/
+legal-documents/
+contract-agreements/
+
+# Advanced DevOps and Infrastructure
+infrastructure-as-code/
+terraform-modules/
+ansible-playbooks/
+kubernetes-manifests/
+helm-charts/
+
+# Advanced Monitoring and Observability
+observability-stack/
+distributed-tracing/
+metrics-collection/
+log-aggregation/
+
+# Performance and Load Testing
+performance-benchmarks/
+load-testing-scenarios/
+stress-testing-results/
+
+# Advanced CI/CD
+pipeline-templates/
+build-optimization/
+deployment-strategies/
+rollback-automation/
+
+# Advanced Development Tools
+code-quality-tools/
+static-analysis/
+security-scanners/
+dependency-vulnerability-scanning/
+
+# Cloud and Container Security
+container-security/
+cloud-security-posture/
+network-security/
+identity-access-management/
+
+# Advanced Backup and Disaster Recovery
+disaster-recovery-plans/
+backup-automation/
+data-retention-policies/
+business-continuity/
+
+# Advanced Documentation
+api-documentation/
+technical-architecture/
+design-documents/
+knowledge-base/
+
+# Advanced Analytics and Business Intelligence
+data-analytics-pipelines/
+business-intelligence-dashboard/
+data-warehousing/
+machine-learning-pipelines/
+
+# ---------- Important Files to Keep ----------
+# Keep package-lock.json for consistency
+!package-lock.json
+
+# Keep migration directory structure
+!backend/prisma/migrations/
+!backend/prisma/migrations/.gitkeep
+
+# Keep important documentation files
+!README.md
+!DEPLOYMENT.md
+!TESTING_REPORT.md
+!SECURITY_FIXES.md
+!SECURITY_POLICY.md
+!COMPLIANCE_REPORT.md
+
+# Keep configuration templates
+!backend/.env.example
+!frontend/.env.example
+!smartcontract/.env.example
+
+# Keep important scripts
+!scripts/
+!scripts/deploy.js
+!scripts/verify.js
+!scripts/security-check.js
+
+# Keep docker files (production)
+!Dockerfile
+!docker-compose.yml
+!docker-compose.prod.yml
+
+# Keep CI/CD configuration
+!.github/workflows/
+!.github/workflows/deploy.yml
+!.github/workflows/security.yml
+!.github/workflows/test.yml
+
+# Keep infrastructure as code
+!terraform/
+!kubernetes/
+!helm/
+
+# Keep security configuration
+!security-policies/
+!.github/SECURITY.md
+!security/scan.sh
+
+# Keep deployment configuration
+!.env.example
+!.gitignore
+
+# Keep monitoring configuration
+!monitoring/
+!observability/
+
+# Keep documentation
+!docs/
+!architecture/
+!api/
+
+# ---------- Security Scanning and Reports ----------
+security-reports/
+*.security-scan.json
+security-audit-reports/
+vulnerability-reports/
+penetration-test-results/
+owasp-zap-reports/
+snyk-reports/
+codeql-reports/
+dependency-check-reports/
+
+# ---------- Performance Testing and Reports ----------
+performance-reports/
+load-test-results/
+stress-test-results/
+k6-reports/
+artillery-reports/
+benchmark-results/
+performance-metrics/
+
+# ---------- Error Tracking and Monitoring ----------
+error-tracking-reports/
+error-logs/
+crash-reports/
+exception-tracking/
+incident-reports/
+uptime-monitoring/

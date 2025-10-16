@@ -1,0 +1,412 @@
+name: 🧪 Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🔍 Run type checking
+        working-directory: ./frontend
+        run: npm run type-check
+
+      - name: 🧪 Run unit tests
+        working-directory: ./frontend
+        run: npm run test:ci
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./frontend/coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  component-tests:
+    name: Component Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🧪 Run component tests
+        working-directory: ./frontend
+        run: npm run test:components
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🧪 Run integration tests
+        working-directory: ./frontend
+        run: npm run test:integration
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🌐 Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: 🏗️ Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 🚀 Start application
+        working-directory: ./frontend
+        run: npm run preview &
+
+      - name: ⏳ Wait for application to start
+        run: sleep 10
+
+      - name: 🧪 Run E2E tests
+        working-directory: ./frontend
+        run: npm run test:e2e
+
+      - name: 📤 Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+      - name: 📤 Upload E2E screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-screenshots
+          path: frontend/test-results/
+          retention-days: 7
+
+      - name: 📤 Upload E2E videos
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-videos
+          path: frontend/test-results/
+          retention-days: 7
+
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🌐 Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: 🏗️ Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 🚀 Start application
+        working-directory: ./frontend
+        run: npm run preview &
+
+      - name: ⏳ Wait for application to start
+        run: sleep 10
+
+      - name: ♿ Run accessibility tests
+        working-directory: ./frontend
+        run: npx playwright test e2e/accessibility.spec.ts
+
+      - name: 📤 Upload accessibility report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: accessibility-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+  visual-regression-tests:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🌐 Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: 🏗️ Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 🚀 Start application
+        working-directory: ./frontend
+        run: npm run preview &
+
+      - name: ⏳ Wait for application to start
+        run: sleep 10
+
+      - name: 📸 Run visual regression tests
+        working-directory: ./frontend
+        run: npx playwright test e2e/visual-regression.spec.ts
+
+      - name: 📤 Upload visual diff screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: visual-diffs
+          path: frontend/test-results/
+          retention-days: 7
+
+  lint-and-security:
+    name: Lint & Security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🔍 Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: 🔐 Run security audit
+        working-directory: ./frontend
+        run: npm audit --audit-level moderate
+
+      - name: 📦 Check for outdated dependencies
+        working-directory: ./frontend
+        run: npx audit-ci --moderate
+
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🔍 Run type check
+        working-directory: ./frontend
+        run: npm run type-check
+
+      - name: 🏗️ Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 📊 Analyze bundle size
+        working-directory: ./frontend
+        run: |
+          npx bundlesize
+        continue-on-error: true
+
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.node-version }}
+          path: frontend/dist/
+          retention-days: 1
+
+  performance-test:
+    name: Performance Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🏗️ Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 🚀 Start application
+        working-directory: ./frontend
+        run: npm run preview &
+
+      - name: ⏳ Wait for application to start
+        run: sleep 15
+
+      - name: 📊 Run Lighthouse CI
+        working-directory: ./frontend
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: 📤 Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: frontend/.lighthouseci/
+          retention-days: 7
+
+  # Summary job
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [
+      unit-tests,
+      component-tests,
+      integration-tests,
+      e2e-tests,
+      accessibility-tests,
+      visual-regression-tests,
+      lint-and-security,
+      build-test,
+      performance-test
+    ]
+    if: always()
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ✅ Create test summary
+        run: |
+          echo "## 🧪 Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Component Tests | ${{ needs.component-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Accessibility Tests | ${{ needs.accessibility-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Visual Regression | ${{ needs.visual-regression-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Security | ${{ needs.lint-and-security.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Test | ${{ needs.build-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Test | ${{ needs.performance-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.unit-tests.result }}" == "failure" || "${{ needs.component-tests.result }}" == "failure" || "${{ needs.integration-tests.result }}" == "failure" || "${{ needs.e2e-tests.result }}" == "failure" || "${{ needs.accessibility-tests.result }}" == "failure" || "${{ needs.visual-regression-tests.result }}" == "failure" || "${{ needs.lint-and-security.result }}" == "failure" || "${{ needs.build-test.result }}" == "failure" ]]; then
+            echo "❌ Some tests failed. Please check the individual job logs for details." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "🎉 All tests passed successfully!" >> $GITHUB_STEP_SUMMARY
+          fi

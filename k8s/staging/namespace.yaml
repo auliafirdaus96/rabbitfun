@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rabbit-launchpad
+  labels:
+    name: rabbit-launchpad
+    environment: staging
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rabbit-monitoring
+  labels:
+    name: rabbit-monitoring
+    environment: staging

@@ -1,0 +1,291 @@
+// This is the development Prisma schema file for SQLite,
+// modified from the main PostgreSQL schema for local development
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User model for wallet-based authentication
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  email         String?  @unique
+  username      String?  @unique
+  displayName   String?
+  avatar        String?
+  bio           String?
+  twitterHandle String?
+  telegramHandle String?
+  website       String?
+  isActive      Boolean  @default(true)
+  isAdmin       Boolean  @default(false)
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  createdTokens    Token[]         @relation("TokenCreator")
+  transactions     Transaction[]
+  tokenFavorites    TokenFavorite[]
+  userAnalytics     UserAnalytics[]
+
+  @@map("users")
+}
+
+// Token model created through smart contract
+model Token {
+  id             String   @id @default(cuid())
+  address        String   @unique
+  name           String
+  symbol         String
+  metadata       String?
+  creatorId      String
+  creatorAddress String
+
+  // Contract state
+  soldSupply     String   @default("0")
+  totalBNB       String   @default("0")
+  initialPrice   String   @default("0")
+  graduated      Boolean  @default(false)
+  exists         Boolean  @default(true)
+
+  // Additional tracking
+  totalPlatformFees  String @default("0")
+  totalCreatorFees   String @default("0")
+  bondingCurveLiquidity String @default("0")
+  liquidityPoolAmount String @default("0")
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  graduatedAt    DateTime?
+
+  // Optional metadata
+  description    String?
+  imageUrl       String?
+  bannerUrl      String?
+  twitterUrl     String?
+  telegramUrl    String?
+  websiteUrl     String?
+
+  // Status and moderation
+  isActive       Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  isVerified     Boolean  @default(false)
+  isHidden       Boolean  @default(false)
+  hideReason     String?
+
+  // Relations
+  transactions   Transaction[]
+  tokenFavorites TokenFavorite[]
+  tokenAnalytics TokenAnalytics[]
+  priceHistory   TokenPriceHistory[]
+
+  // Creator relation (reference to User if exists)
+  creator        User?    @relation("TokenCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+
+  @@map("tokens")
+}
+
+// Transaction model for all buy/sell operations
+model Transaction {
+  id            String   @id @default(cuid())
+  hash          String   @unique
+  blockNumber   String
+  blockHash     String
+  transactionIndex Int
+
+  // Transaction details
+  type          TransactionType // BUY or SELL
+  tokenId       String
+  tokenAddress  String
+  traderAddress String
+
+  // Amounts
+  tokenAmount   String
+  bnbAmount     String
+  price         String
+
+  // Fees
+  platformFee   String  @default("0")
+  creatorFee    String  @default("0")
+  totalFee      String  @default("0")
+
+  // Price impact
+  priceImpact   String  @default("0")
+
+  // Status
+  status        TransactionStatus @default(PENDING)
+  gasUsed       String?
+  gasPrice      String?
+  errorMessage  String?
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  confirmedAt   DateTime?
+
+  // Relations
+  token         Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+  trader        User?    @relation(fields: [traderAddress], references: [walletAddress], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+// Token favorites for users
+model TokenFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenId   String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tokenId])
+  @@map("token_favorites")
+}
+
+// Analytics data for tokens
+model TokenAnalytics {
+  id          String   @id @default(cuid())
+  tokenId     String
+  date        DateTime @default(now())
+
+  // Trading metrics
+  totalVolume  String @default("0")
+  totalTrades  Int    @default(0)
+  totalBuyers  Int    @default(0)
+  totalSellers Int    @default(0)
+
+  // Price metrics
+  openPrice    String @default("0")
+  closePrice   String @default("0")
+  highPrice    String @default("0")
+  lowPrice     String @default("0")
+
+  // Market metrics
+  marketCap    String @default("0")
+  liquidity    String @default("0")
+
+  // Relations
+  token        Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@unique([tokenId, date])
+  @@map("token_analytics")
+}
+
+// User activity analytics
+model UserAnalytics {
+  id      String   @id @default(cuid())
+  userId  String
+  date    DateTime @default(now())
+
+  // Activity metrics
+  tokensCreated    Int @default(0)
+  transactionsMade Int @default(0)
+  volumeTraded     String @default("0")
+
+  // Portfolio metrics
+  portfolioValue   String @default("0")
+  holdingsCount    Int @default(0)
+  favoritesCount   Int @default(0)
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("user_analytics")
+}
+
+// Simple analytics model for real-time tracking
+model Analytics {
+  id            String   @id @default(cuid())
+  tokenAddress  String   @unique
+  holders       Int      @default(0)
+  transactions  Int      @default(0)
+  volume24h     String   @default("0")
+  price         String   @default("0")
+  marketCap     String   @default("0")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  graduated     Boolean  @default(false)
+
+  @@map("analytics")
+}
+
+// User portfolio tracking
+model Portfolio {
+  id              String   @id @default(cuid())
+  userAddress     String
+  tokenAddress    String
+  tokenAmount     String   @default("0")
+  averageBuyPrice String   @default("0")
+  totalInvested   String   @default("0")
+  currentValue    String   @default("0")
+  pnl             String   @default("0")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userAddress, tokenAddress])
+  @@map("portfolio")
+}
+
+// Token price history for charts
+model TokenPriceHistory {
+  id        String   @id @default(cuid())
+  tokenId   String
+  timestamp DateTime @default(now())
+  price     String
+  supply    String   @default("0")
+
+  // Relations
+  token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@map("token_price_history")
+}
+
+// System configuration
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_config")
+}
+
+// Audit logs for admin actions
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  action      String
+  resource    String
+  resourceId  String?
+  oldValue    String?
+  newValue    String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+// Enums
+enum TransactionType {
+  BUY
+  SELL
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
