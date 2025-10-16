@@ -257,25 +257,41 @@ export const SearchProvider = ({ children }: SearchProviderProps) => {
 
   // Calculate filtered and sorted results
 
-  // Separate into trending projects and featured coins
-  // Backend tokens (newly created) go to Featured section first, even with 0% progress
-  const backendFeaturedCoins = backendTokens.filter(coin => coin.isLive);
+  // Separate into trending projects and featured coins - NO DUPLICATIONS
+  // ALL tokens (backend + static) are processed through same logic based on progress/trending criteria
 
-  // Static tokens: Newly created tokens (progress < 50) go to Featured, mature tokens (progress >= 50) go to Hot Projects/Trending
-  const staticHotProjects = mockCoins.filter(coin => coin.isLive && coin.progress >= 50);
-  const staticFeaturedCoins = mockCoins.filter(coin => coin.isLive && coin.progress < 50);
+  // 1. Combine all tokens (backend + static) for unified processing
+  const allTokens = [...backendTokens, ...mockCoins].filter(coin => coin.isLive);
 
-  // Combine backend and static featured coins, with fallback to ensure we always have data
-  const hotProjects = staticHotProjects.length > 0 ? staticHotProjects : mockCoins.slice(0, 6);
-  const featuredCoins = staticFeaturedCoins.length > 0 ? [...backendFeaturedCoins, ...staticFeaturedCoins] : mockCoins.slice(0, 8);
+  // 2. Deduplicate by contract address (ensure 1 data = 1 informasi)
+  const uniqueTokens = allTokens.filter((token, index, self) =>
+    index === self.findIndex(t =>
+      (t.contractAddress || t.contract) === (token.contractAddress || token.contract)
+    )
+  );
+
+  // 3. Split based on criteria:
+  // - Featured: Progress < 50% OR trending score < 30 (new/not trending yet)
+  // - Trending: Progress >= 50% AND trending score >= 30 (established/trending)
+  const featuredCoins = uniqueTokens.filter(coin =>
+    coin.progress < 50 || (coin.trendingScore !== undefined && coin.trendingScore < 30)
+  );
+
+  const hotProjects = uniqueTokens.filter(coin =>
+    coin.progress >= 50 && (coin.trendingScore !== undefined && coin.trendingScore >= 30)
+  );
+
+  // 4. Fallback logic - ensure we always have data but NO DUPLICATIONS
+  const finalHotProjects = hotProjects.length > 0 ? hotProjects : uniqueTokens.slice(0, 6);
+  const finalFeaturedCoins = featuredCoins.length > 0 ? featuredCoins : uniqueTokens.slice(6, 14);
 
   const filteredProjects = sortProjects(
-    filterAndSearchProjects(hotProjects, searchTerm, activeFilter),
+    filterAndSearchProjects(finalHotProjects, searchTerm, activeFilter),
     sortBy
   );
 
   const filteredFeaturedCoins = sortFeaturedCoins(
-    filterAndSearchFeaturedCoins(featuredCoins, searchTerm),
+    filterAndSearchFeaturedCoins(finalFeaturedCoins, searchTerm),
     sortBy
   );
 
