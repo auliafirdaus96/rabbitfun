@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma-production';
+import { PrismaClient } from '../generated/prisma';
 import logger from '../utils/logger';
 
 class ProductionDatabaseService {

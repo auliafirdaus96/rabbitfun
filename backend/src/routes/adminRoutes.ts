@@ -27,7 +27,7 @@ router.get('/transactions', generalLimiter, adminController.getTransactions);
 router.get('/audit-logs', generalLimiter, adminController.getAuditLogs);
 router.put('/system-config', generalLimiter, adminController.updateSystemConfig);
 
-// System notifications (admin only)
-router.post('/system-notification', generalLimiter, adminController.createSystemNotification);
+// System notifications (admin only) - TODO: Implement this method
+// router.post('/system-notification', generalLimiter, adminController.createSystemNotification);
 
 export default router;

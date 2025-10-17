@@ -1,5 +1,5 @@
-// This is the development Prisma schema file for SQLite,
-// compatible with the existing codebase structure
+// This is the production Prisma schema file for PostgreSQL,
+// optimized for production deployment with proper indexing and constraints
 
 generator client {
   provider = "prisma-client-js"
@@ -7,8 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // User model for wallet-based authentication
@@ -26,9 +26,6 @@ model User {
   isActive      Boolean  @default(true)
   isAdmin       Boolean  @default(false)
   isVerified    Boolean  @default(false)
-  role          String   @default("user")
-  lastLoginAt   DateTime?
-  loginCount    Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -38,6 +35,10 @@ model User {
   tokenFavorites    TokenFavorite[]
   userAnalytics     UserAnalytics[]
 
+  @@index([walletAddress])
+  @@index([email])
+  @@index([username])
+  @@index([isActive])
   @@map("users")
 }
 
@@ -62,10 +63,6 @@ model Token {
   totalCreatorFees   String @default("0")
   bondingCurveLiquidity String @default("0")
   liquidityPoolAmount String @default("0")
-
-  // Price tracking
-  currentPrice   String   @default("0")
-  marketCap      String   @default("0")
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -97,6 +94,13 @@ model Token {
   creatorId      String?  // Make optional for SetNull to work
   creator        User?    @relation("TokenCreator", fields: [creatorId], references: [id], onDelete: SetNull)
 
+  @@index([address])
+  @@index([creatorAddress])
+  @@index([isActive])
+  @@index([graduated])
+  @@index([createdAt])
+  @@index([symbol])
+  @@index([isFeatured])
   @@map("tokens")
 }
 
@@ -141,6 +145,13 @@ model Transaction {
   token         Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
   trader        User?    @relation(fields: [traderAddress], references: [walletAddress], onDelete: SetNull)
 
+  @@index([hash])
+  @@index([tokenAddress])
+  @@index([traderAddress])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@index([blockNumber])
   @@map("transactions")
 }
 
@@ -156,6 +167,8 @@ model TokenFavorite {
   token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tokenId])
+  @@index([userId])
+  @@index([tokenId])
   @@map("token_favorites")
 }
 
@@ -170,7 +183,6 @@ model TokenAnalytics {
   totalTrades  Int    @default(0)
   totalBuyers  Int    @default(0)
   totalSellers Int    @default(0)
-  uniqueTraders Int   @default(0)
 
   // Price metrics
   openPrice    String @default("0")
@@ -186,6 +198,8 @@ model TokenAnalytics {
   token        Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
 
   @@unique([tokenId, date])
+  @@index([tokenId])
+  @@index([date])
   @@map("token_analytics")
 }
 
@@ -209,6 +223,8 @@ model UserAnalytics {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
   @@map("user_analytics")
 }
 
@@ -225,6 +241,9 @@ model Analytics {
   updatedAt     DateTime @updatedAt
   graduated     Boolean  @default(false)
 
+  @@index([tokenAddress])
+  @@index([graduated])
+  @@index([createdAt])
   @@map("analytics")
 }
 
@@ -242,6 +261,8 @@ model Portfolio {
   updatedAt       DateTime @updatedAt
 
   @@unique([userAddress, tokenAddress])
+  @@index([userAddress])
+  @@index([tokenAddress])
   @@map("portfolio")
 }
 
@@ -256,6 +277,8 @@ model TokenPriceHistory {
   // Relations
   token     Token    @relation(fields: [tokenId], references: [id], onDelete: Cascade)
 
+  @@index([tokenId])
+  @@index([timestamp])
   @@map("token_price_history")
 }
 
@@ -267,6 +290,7 @@ model SystemConfig {
   description String?
   updatedAt   DateTime @updatedAt
 
+  @@index([key])
   @@map("system_config")
 }
 
@@ -283,6 +307,10 @@ model AuditLog {
   userAgent   String?
   createdAt   DateTime @default(now())
 
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
   @@map("audit_logs")
 }
 
@@ -294,8 +322,6 @@ enum TransactionType {
 
 enum TransactionStatus {
   PENDING
-  PROCESSING
   CONFIRMED
   FAILED
-  CANCELLED
 }

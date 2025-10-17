@@ -1,0 +1,83 @@
+# ==============================================
+# Rabbit Launchpad - Production Dockerfile
+# ==============================================
+
+# Build Stage
+FROM node:18-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies for building
+RUN apk add --no-cache python3 make g++ \
+    && apk add --no-cache git
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY prisma ./prisma/
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy source code
+COPY src ./src/
+COPY scripts ./scripts/
+
+# Build the application
+RUN npm run build
+
+# Production Stage
+FROM node:18-alpine AS runner
+
+# Install security updates
+RUN apk update && apk upgrade && \
+    apk add --no-cache curl dumb-init && \
+    addgroup -g 1001 -S nodejs && \
+    adduser -S rabbituser -u 1001
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN npx prisma generate
+
+# Copy built application
+COPY --from=builder --chown=rabbituser:nodejs /app/dist ./dist
+
+# Copy scripts
+COPY --from=builder --chown=rabbituser:nodejs /app/scripts ./scripts
+
+# Create necessary directories
+RUN mkdir -p logs uploads && \
+    chown -R rabbituser:nodejs logs uploads
+
+# Switch to non-root user
+USER rabbituser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1
+
+# Expose port
+EXPOSE 3001
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "dist/server.js"]

@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-10-17T18:40:12.154Z",
+  "results": [
+    {
+      "name": "Health Check",
+      "path": "/health",
+      "method": "GET",
+      "avg": 279.27,
+      "min": 264.52,
+      "max": 312.21,
+      "p50": 278.72,
+      "p95": 299.61,
+      "p99": 312.21,
+      "errorRate": 0,
+      "rps": 160.15
+    },
+    {
+      "name": "API Info",
+      "path": "/api",
+      "method": "GET",
+      "avg": 3.78,
+      "min": 2.59,
+      "max": 10.58,
+      "p50": 3.25,
+      "p95": 6,
+      "p99": 10.58,
+      "errorRate": 0,
+      "rps": 4726.26
+    },
+    {
+      "name": "Token List",
+      "path": "/api/tokens",
+      "method": "GET",
+      "avg": 3.49,
+      "min": 2.58,
+      "max": 5.54,
+      "p50": 3.4,
+      "p95": 4.82,
+      "p99": 5.54,
+      "errorRate": 0,
+      "rps": 9028.53
+    },
+    {
+      "name": "Token List (Limited)",
+      "path": "/api/tokens?limit=10",
+      "method": "GET",
+      "avg": 3.22,
+      "min": 2.41,
+      "max": 5.57,
+      "p50": 3.07,
+      "p95": 4.51,
+      "p99": 5.57,
+      "errorRate": 0,
+      "rps": 8973.76
+    }
+  ],
+  "summary": {
+    "icon": "✅",
+    "message": "GOOD - Performance is acceptable"
+  }
+}

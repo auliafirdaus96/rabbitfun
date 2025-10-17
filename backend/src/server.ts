@@ -136,11 +136,11 @@ app.get('/health', async (_req, res) => {
 const blockchainService = new BlockchainService();
 
 // API Routes with specific rate limiting
-// app.use('/api/auth', apiLimiter, authRoutes);
-// app.use('/api/users', apiLimiter, userRoutes);
-// app.use('/api/portfolio', apiLimiter, portfolioRoutes);
-// app.use('/api/notifications', apiLimiter, notificationRoutes);
-// app.use('/api/admin', apiLimiter, adminRoutes);
+app.use('/api/auth', apiLimiter, authRoutes);
+app.use('/api/users', apiLimiter, userRoutes);
+app.use('/api/portfolio', apiLimiter, portfolioRoutes);
+app.use('/api/notifications', apiLimiter, notificationRoutes);
+app.use('/api/admin', apiLimiter, adminRoutes);
 app.use('/api/tokens', apiLimiter, tokenRoutes);
 app.use('/api/analytics', analyticsLimiter, analyticsRoutes);
 app.use('/api/webhooks', webhookRoutes);
@@ -187,7 +187,14 @@ app.get('/', (_req, res) => {
       health: '/health',
       api: '/api',
       docs: '/api-docs',
-      blockchain: '/api/blockchain/health'
+      blockchain: '/api/blockchain/health',
+      auth: '/api/auth',
+      users: '/api/users',
+      tokens: '/api/tokens',
+      portfolio: '/api/portfolio',
+      analytics: '/api/analytics',
+      notifications: '/api/notifications',
+      admin: '/api/admin'
     }
   });
 });
