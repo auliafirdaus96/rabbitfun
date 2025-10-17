@@ -1,12 +1,12 @@
 import { ethers } from "hardhat";
-import { AhiruLaunchpad } from "../client/src/types/contracts";
+import { RabbitLaunchpad } from "../client/src/types/contracts";
 
 async function debugEvent() {
   console.log("Starting debug...");
 
   const [owner, creator, treasury, dexRouter] = await ethers.getSigners();
 
-  const Launchpad = await ethers.getContractFactory("AhiruLaunchpad");
+  const Launchpad = await ethers.getContractFactory("RabbitLaunchpad");
   const launchpad = await Launchpad.deploy(
     await treasury.getAddress(),
     await dexRouter.getAddress()

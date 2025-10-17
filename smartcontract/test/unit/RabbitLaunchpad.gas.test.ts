@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import "@nomicfoundation/hardhat-chai-matchers";
 import { RabbitLaunchpad } from "../../client/src/types/contracts";
-import { AhiruToken } from "../../client/src/types/contracts";
+import { RabbitToken } from "../../client/src/types/contracts";
 
 describe("RabbitLaunchpad - Gas Optimization", function () {
   let launchpad: RabbitLaunchpad;
@@ -12,7 +12,7 @@ describe("RabbitLaunchpad - Gas Optimization", function () {
   let buyer: SignerWithAddress;
   let treasury: SignerWithAddress;
   let dexRouter: SignerWithAddress;
-  let token: AhiruToken;
+  let token: RabbitToken;
 
   const CREATE_FEE = ethers.parseEther("0.005");
 
@@ -35,7 +35,7 @@ describe("RabbitLaunchpad - Gas Optimization", function () {
     );
 
     const tokenAddress = await launchpad.getAllTokens().then(tokens => tokens[0]);
-    token = await ethers.getContractAt("AhiruToken", tokenAddress);
+    token = await ethers.getContractAt("RabbitToken", tokenAddress);
   });
 
   describe("Deployment Gas Usage", function () {
@@ -246,7 +246,7 @@ describe("RabbitLaunchpad - Gas Optimization", function () {
         const tokenAddress = token3Address; // Add reference for backward compatibility
 
         await launchpad.connect(buyer).buy(tokenAddress, { value: ethers.parseEther("10") });
-        const testToken = await ethers.getContractAt("AhiruToken", tokenAddress);
+        const testToken = await ethers.getContractAt("RabbitToken", tokenAddress);
         const balance = await testToken.balanceOf(await buyer.getAddress());
         const sellAmount = (balance * BigInt(Math.floor(fraction * 100))) / 100n;
 

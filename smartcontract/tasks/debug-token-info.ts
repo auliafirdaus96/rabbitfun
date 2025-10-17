@@ -6,7 +6,7 @@ task("debug-token-info", "Debugs token info structure")
 
     const [owner, creator, treasury, dexRouter] = await ethers.getSigners();
 
-    const Launchpad = await ethers.getContractFactory("AhiruLaunchpad");
+    const Launchpad = await ethers.getContractFactory("RabbitLaunchpad");
     const launchpad = await Launchpad.deploy(
       await treasury.getAddress(),
       await dexRouter.getAddress()

@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import "@nomicfoundation/hardhat-chai-matchers";
 import { RabbitLaunchpad } from "../../client/src/types/contracts";
-import { AhiruToken } from "../../client/src/types/contracts";
+import { RabbitToken } from "../../client/src/types/contracts";
 
 describe("RabbitLaunchpad - Security Vulnerabilities", function () {
   let launchpad: RabbitLaunchpad;
@@ -13,7 +13,7 @@ describe("RabbitLaunchpad - Security Vulnerabilities", function () {
   let attacker: SignerWithAddress;
   let treasury: SignerWithAddress;
   let dexRouter: SignerWithAddress;
-  let token: AhiruToken;
+  let token: RabbitToken;
 
   const CREATE_FEE = ethers.parseEther("0.005");
 
@@ -36,7 +36,7 @@ describe("RabbitLaunchpad - Security Vulnerabilities", function () {
     );
 
     const tokenAddress = await launchpad.getAllTokens().then(tokens => tokens[0]);
-    token = await ethers.getContractAt("AhiruToken", tokenAddress);
+    token = await ethers.getContractAt("RabbitToken", tokenAddress);
   });
 
   describe("Reentrancy Protection", function () {

@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import "@nomicfoundation/hardhat-chai-matchers";
 import { RabbitLaunchpad } from "../../client/src/types/contracts";
-import { AhiruToken } from "../../client/src/types/contracts";
+import { RabbitToken } from "../../client/src/types/contracts";
 
 describe("RabbitLaunchpad - Graduation Functionality", function () {
   const anyValue: any = "any";
@@ -13,7 +13,7 @@ describe("RabbitLaunchpad - Graduation Functionality", function () {
   let buyer: SignerWithAddress;
   let treasury: SignerWithAddress;
   let dexRouter: SignerWithAddress;
-  let token: AhiruToken;
+  let token: RabbitToken;
 
   const CREATE_FEE = ethers.parseEther("0.005");
   const GRADUATION_THRESHOLD = ethers.parseEther("1"); // 1 BNB
@@ -38,7 +38,7 @@ describe("RabbitLaunchpad - Graduation Functionality", function () {
     );
 
     const tokenAddress = await launchpad.getAllTokens().then(tokens => tokens[0]);
-    token = await ethers.getContractAt("AhiruToken", tokenAddress);
+    token = await ethers.getContractAt("RabbitToken", tokenAddress);
   });
 
   describe("Basic Graduation Functionality", function () {

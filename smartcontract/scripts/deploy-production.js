@@ -27,13 +27,13 @@ async function main() {
   const deploymentCost = ethers.utils.parseEther("0.3");
   console.log(`Estimated deployment cost: ${ethers.utils.formatEther(deploymentCost)} BNB`);
 
-  // Deploy AhiruToken with production parameters
-  console.log("\n📄 Deploying AhiruToken...");
-  const TokenFactory = await ethers.getContractFactory("AhiruToken");
+  // Deploy RabbitToken with production parameters
+  console.log("\n📄 Deploying RabbitToken...");
+  const TokenFactory = await ethers.getContractFactory("RabbitToken");
 
   const tokenArgs = [
-    "Ahiru Token",           // name
-    "AHIRU",                 // symbol
+    "Rabbit Token",           // name
+    "RABBIT",                 // symbol
     ethers.utils.parseUnits("1000000000", 18), // 1B tokens supply
     deployer.address         // owner
   ];
@@ -41,11 +41,11 @@ async function main() {
   const tokenContract = await TokenFactory.deploy(...tokenArgs);
   await tokenContract.deployed();
 
-  console.log(`✅ AhiruToken deployed: ${tokenContract.address}`);
+  console.log(`✅ RabbitToken deployed: ${tokenContract.address}`);
 
-  // Deploy AhiruLaunchpad with production parameters
-  console.log("\n🚀 Deploying AhiruLaunchpad...");
-  const LaunchpadFactory = await ethers.getContractFactory("AhiruLaunchpad");
+  // Deploy RabbitLaunchpad with production parameters
+  console.log("\n🚀 Deploying RabbitLaunchpad...");
+  const LaunchpadFactory = await ethers.getContractFactory("RabbitLaunchpad");
 
   const launchpadArgs = [
     tokenContract.address,                           // token address
@@ -61,7 +61,7 @@ async function main() {
   const launchpadContract = await LaunchpadFactory.deploy(...launchpadArgs);
   await launchpadContract.deployed();
 
-  console.log(`✅ AhiruLaunchpad deployed: ${launchpadContract.address}`);
+  console.log(`✅ RabbitLaunchpad deployed: ${launchpadContract.address}`);
 
   // Transfer platform tokens to launchpad
   console.log("\n💰 Transferring platform tokens to launchpad...");
@@ -90,8 +90,8 @@ async function main() {
 
   console.log("\n📊 Deployment Summary:");
   console.log("========================");
-  console.log(`📄 AhiruToken: ${tokenContract.address}`);
-  console.log(`🚀 AhiruLaunchpad: ${launchpadContract.address}`);
+  console.log(`📄 RabbitToken: ${tokenContract.address}`);
+  console.log(`🚀 RabbitLaunchpad: ${launchpadContract.address}`);
   console.log(`💰 Platform tokens in launchpad: ${ethers.utils.formatUnits(finalTokenBalance, 18)}`);
   console.log(`👛 Owner tokens: ${ethers.utils.formatUnits(ownerBalance, 18)}`);
   console.log(`🏢 Deployer: ${deployer.address}`);
@@ -104,11 +104,11 @@ async function main() {
     timestamp: new Date().toISOString(),
     deployer: deployer.address,
     contracts: {
-      AhiruToken: {
+      RabbitToken: {
         address: tokenContract.address,
         deploymentHash: tokenContract.deployTransaction.hash
       },
-      AhiruLaunchpad: {
+      RabbitLaunchpad: {
         address: launchpadContract.address,
         deploymentHash: launchpadContract.deployTransaction.hash
       }

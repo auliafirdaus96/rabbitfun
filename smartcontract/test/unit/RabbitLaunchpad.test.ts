@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import "@nomicfoundation/hardhat-chai-matchers";
-import { RabbitLaunchpad, AhiruToken } from "../../client/src/types/contracts";
+import { RabbitLaunchpad, RabbitToken } from "../../client/src/types/contracts";
 const any = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 
 describe("RabbitLaunchpad - Buy Functionality", function () {
@@ -13,7 +13,7 @@ describe("RabbitLaunchpad - Buy Functionality", function () {
   let buyer2: SignerWithAddress;
   let treasury: SignerWithAddress;
   let dexRouter: SignerWithAddress;
-  let token: AhiruToken;
+  let token: RabbitToken;
 
   const CREATE_FEE = ethers.parseEther("0.005");
   const INITIAL_PRICE = ethers.parseEther("0.0000005");
@@ -41,7 +41,7 @@ describe("RabbitLaunchpad - Buy Functionality", function () {
     const allTokens = await launchpad.getAllTokens();
     expect(allTokens.length).to.be.gt(0);
     const tokenAddress = allTokens[0];
-    token = await ethers.getContractAt("AhiruToken", tokenAddress);
+    token = await ethers.getContractAt("RabbitToken", tokenAddress);
   });
 
   describe("Basic Buy Functionality", function () {

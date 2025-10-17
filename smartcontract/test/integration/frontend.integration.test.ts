@@ -2,24 +2,24 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import "@nomicfoundation/hardhat-chai-matchers";
-import { AhiruLaunchpad } from "../../client/src/types/contracts";
-import { AhiruToken } from "../../client/src/types/contracts";
+import { RabbitLaunchpad } from "../../client/src/types/contracts";
+import { RabbitToken } from "../../client/src/types/contracts";
 
 describe("Frontend Integration Tests", function () {
-  let launchpad: AhiruLaunchpad;
+  let launchpad: RabbitLaunchpad;
   let owner: SignerWithAddress;
   let creator: SignerWithAddress;
   let buyer: SignerWithAddress;
   let treasury: SignerWithAddress;
   let dexRouter: SignerWithAddress;
-  let token: AhiruToken;
+  let token: RabbitToken;
 
   const CREATE_FEE = ethers.parseEther("0.005");
 
   beforeEach(async function () {
     [owner, creator, buyer, treasury, dexRouter] = await ethers.getSigners();
 
-    const Launchpad = await ethers.getContractFactory("AhiruLaunchpad");
+    const Launchpad = await ethers.getContractFactory("RabbitLaunchpad");
     launchpad = await Launchpad.deploy(
       await treasury.getAddress(),
       await dexRouter.getAddress()
@@ -44,7 +44,7 @@ describe("Frontend Integration Tests", function () {
     }
 
     const tokenAddress = parsedEvent.args.tokenAddress;
-    token = await ethers.getContractAt("AhiruToken", tokenAddress);
+    token = await ethers.getContractAt("RabbitToken", tokenAddress);
   });
 
   describe("Token Creation Flow", function () {

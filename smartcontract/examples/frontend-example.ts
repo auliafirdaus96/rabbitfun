@@ -1,8 +1,8 @@
-import { AhiruClient } from '../src/client/AhiruClient';
+import { RabbitClient } from '../src/client/RabbitClient';
 
 async function exampleUsage() {
   // Initialize client
-  const client = new AhiruClient();
+  const client = new RabbitClient();
 
   try {
     // Connect to wallet
@@ -93,7 +93,7 @@ async function exampleUsage() {
 
 // Error handling example
 async function errorHandlingExample() {
-  const client = new AhiruClient();
+  const client = new RabbitClient();
 
   try {
     await client.connect();
@@ -116,7 +116,7 @@ async function errorHandlingExample() {
 
 // Pagination example
 async function paginationExample() {
-  const client = new AhiruClient();
+  const client = new RabbitClient();
 
   try {
     await client.connect();
@@ -144,7 +144,7 @@ async function paginationExample() {
 
 // Real-time updates example
 async function realTimeUpdatesExample() {
-  const client = new AhiruClient();
+  const client = new RabbitClient();
 
   try {
     await client.connect();
@@ -186,7 +186,7 @@ export {
 
 // Run examples if this file is executed directly
 if (require.main === module) {
-  console.log('Running AhiruClient examples...');
+  console.log('Running RabbitClient examples...');
 
   exampleUsage()
     .then(() => errorHandlingExample())

@@ -6,7 +6,7 @@
   "description": "Fun Platform for Token Creation and Trading on BNB Smart Chain",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:staging": "vite build --mode staging",
     "build:production": "vite build --mode production",

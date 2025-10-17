@@ -13,15 +13,15 @@ services:
       - NODE_ENV=production
       - PORT=3001
       - WS_PORT=3002
-      - FRONTEND_URL=https://ahiru-launchpad.com
-      - MONGODB_URI=mongodb://mongodb:27017/ahiru-production
+      - FRONTEND_URL=https://rabbitfun.vercel.app
+      - MONGODB_URI=mongodb://mongodb:27017/rabbitfun-production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=${JWT_SECRET}
       - BSC_RPC_URL=${BSC_RPC_URL}
       - BSC_RPC_BACKUP=${BSC_RPC_BACKUP}
-      - AHIRU_TOKEN_ADDRESS=${AHIRU_TOKEN_ADDRESS}
-      - AHIRU_LAUNCHPAD_ADDRESS=${AHIRU_LAUNCHPAD_ADDRESS}
+      - RABBIT_TOKEN_ADDRESS=${RABBIT_TOKEN_ADDRESS}
+      - RABBIT_LAUNCHPAD_ADDRESS=${RABBIT_LAUNCHPAD_ADDRESS}
       - BSCSCAN_API_KEY=${BSCSCAN_API_KEY}
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
       - MORALIS_API_KEY=${MORALIS_API_KEY}
@@ -46,7 +46,7 @@ services:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
     networks:
-      - ahiru-network
+      - rabbitfun-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 30s
@@ -62,13 +62,13 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-      - MONGO_INITDB_DATABASE=ahiru-production
+      - MONGO_INITDB_DATABASE=rabbitfun-production
     volumes:
       - mongodb_data:/data/db
       - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     restart: unless-stopped
     networks:
-      - ahiru-network
+      - rabbitfun-network
     command: mongod --auth --bind_ip_all
 
   # Redis Cache
@@ -81,7 +81,7 @@ services:
       - redis_data:/data
     restart: unless-stopped
     networks:
-      - ahiru-network
+      - rabbitfun-network
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 30s
@@ -102,7 +102,7 @@ services:
       - backend
     restart: unless-stopped
     networks:
-      - ahiru-network
+      - rabbitfun-network
 
   # Analytics Processor
   analytics:
@@ -111,12 +111,12 @@ services:
       dockerfile: Dockerfile.analytics
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongodb:27017/ahiru-production
+      - MONGODB_URI=mongodb://mongodb:27017/rabbitfun-production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - BSC_RPC_URL=${BSC_RPC_URL}
-      - AHIRU_TOKEN_ADDRESS=${AHIRU_TOKEN_ADDRESS}
-      - AHIRU_LAUNCHPAD_ADDRESS=${AHIRU_LAUNCHPAD_ADDRESS}
+      - RABBIT_TOKEN_ADDRESS=${RABBIT_TOKEN_ADDRESS}
+      - RABBIT_LAUNCHPAD_ADDRESS=${RABBIT_LAUNCHPAD_ADDRESS}
     depends_on:
       - mongodb
       - redis
@@ -124,7 +124,7 @@ services:
     volumes:
       - ./logs/analytics:/app/logs
     networks:
-      - ahiru-network
+      - rabbitfun-network
 
   # Blockchain Event Listener
   event-listener:
@@ -133,12 +133,12 @@ services:
       dockerfile: Dockerfile.event-listener
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongodb:27017/ahiru-production
+      - MONGODB_URI=mongodb://mongodb:27017/rabbitfun-production
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - BSC_RPC_URL=${BSC_RPC_URL}
-      - AHIRU_TOKEN_ADDRESS=${AHIRU_TOKEN_ADDRESS}
-      - AHIRU_LAUNCHPAD_ADDRESS=${AHIRU_LAUNCHPAD_ADDRESS}
+      - RABBIT_TOKEN_ADDRESS=${RABBIT_TOKEN_ADDRESS}
+      - RABBIT_LAUNCHPAD_ADDRESS=${RABBIT_LAUNCHPAD_ADDRESS}
       - BSCSCAN_API_KEY=${BSCSCAN_API_KEY}
     depends_on:
       - mongodb
@@ -147,7 +147,7 @@ services:
     volumes:
       - ./logs/events:/app/logs
     networks:
-      - ahiru-network
+      - rabbitfun-network
 
   # Monitoring & Alerting
   monitoring:
@@ -156,7 +156,7 @@ services:
       dockerfile: Dockerfile.monitoring
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongodb:27017/ahiru-production
+      - MONGODB_URI=mongodb://mongodb:27017/rabbitfun-production
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USER=${SMTP_USER}
@@ -171,7 +171,7 @@ services:
     volumes:
       - ./logs/monitoring:/app/logs
     networks:
-      - ahiru-network
+      - rabbitfun-network
 
 volumes:
   mongodb_data:
@@ -180,5 +180,5 @@ volumes:
     driver: local
 
 networks:
-  ahiru-network:
+  rabbitfun-network:
     driver: bridge

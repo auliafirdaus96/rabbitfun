@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { AhiruLaunchpad, AhiruToken } from "../../client/src/types/contracts";
+import { RabbitLaunchpad, RabbitToken } from "../../client/src/types/contracts";
 import {
   setupContract,
   createTestToken,
@@ -14,12 +14,12 @@ import {
 } from "../setup";
 
 describe("Bonding Curve Calculations", function () {
-  let ahiruLaunchpad: AhiruLaunchpad;
+  let rabbitLaunchpad: RabbitLaunchpad;
   let setup: any;
 
   beforeEach(async function () {
     setup = await setupContract();
-    ahiruLaunchpad = setup.ahiruLaunchpad;
+    rabbitLaunchpad = setup.rabbitLaunchpad;
   });
 
   describe("Initial Price Calculation", function () {
@@ -83,7 +83,7 @@ describe("Bonding Curve Calculations", function () {
 
     it("Should calculate tokens correctly using smart contract", async function () {
       const tokenSetup = await createTestToken(setup, "Price Test", "PRICE");
-      const { ahiruLaunchpad, users } = setup;
+      const { rabbitLaunchpad, users } = setup;
       const buyer = users[3];
 
       const bnbAmount = ethers.parseEther("0.01");
@@ -92,7 +92,7 @@ describe("Bonding Curve Calculations", function () {
       const expectedTokens = await calculateExpectedTokens(bnbAmount, 0n);
 
       // Get actual tokens from contract
-      const actualTokens = await ahiruLaunchpad.calculateTokenPurchase(
+      const actualTokens = await rabbitLaunchpad.calculateTokenPurchase(
         0n,
         bnbAmount,
         DEFAULT_TEST_PARAMS.INITIAL_PRICE,
@@ -138,7 +138,7 @@ describe("Bonding Curve Calculations", function () {
 
     it("Should calculate BNB correctly using smart contract", async function () {
       const tokenSetup = await createTestToken(setup, "BNB Test", "BNB");
-      const { ahiruLaunchpad } = setup;
+      const { rabbitLaunchpad } = setup;
 
       const tokenAmount = ethers.parseEther("500");
       const currentSupply = ethers.parseEther("2000");
@@ -147,7 +147,7 @@ describe("Bonding Curve Calculations", function () {
       const expectedBNB = await calculateExpectedBNB(tokenAmount, currentSupply);
 
       // Get actual BNB from contract
-      const actualBNB = await ahiruLaunchpad.calculateTokenSale(currentSupply, tokenAmount, DEFAULT_TEST_PARAMS.INITIAL_PRICE, 0);
+      const actualBNB = await rabbitLaunchpad.calculateTokenSale(currentSupply, tokenAmount, DEFAULT_TEST_PARAMS.INITIAL_PRICE, 0);
 
       expectAlmostEqual(actualBNB, expectedBNB, ethers.parseEther("0.0001"));
     });
@@ -267,27 +267,27 @@ describe("Bonding Curve Calculations", function () {
 
   describe("Integration with Contract Constants", function () {
     it("Should use correct initial price from contract", async function () {
-      const contractInitialPrice = await ahiruLaunchpad.INITIAL_PRICE();
+      const contractInitialPrice = await rabbitLaunchpad.INITIAL_PRICE();
       expect(contractInitialPrice).to.equal(DEFAULT_TEST_PARAMS.INITIAL_PRICE);
     });
 
     it("Should use correct curve slope from contract", async function () {
-      // const contractSlope = await ahiruLaunchpad.CURVE_SLOPE(); // Not available on contract
+      // const contractSlope = await rabbitLaunchpad.CURVE_SLOPE(); // Not available on contract
       // expect(contractSlope).to.equal(DEFAULT_TEST_PARAMS.CURVE_SLOPE); // Slope not exposed on contract
     });
 
     it("Should use correct create fee from contract", async function () {
-      const contractCreateFee = await ahiruLaunchpad.CREATE_FEE();
+      const contractCreateFee = await rabbitLaunchpad.CREATE_FEE();
       expect(contractCreateFee).to.equal(DEFAULT_TEST_PARAMS.CREATE_FEE);
     });
 
     it("Should use correct total supply from contract", async function () {
-      const contractTotalSupply = await ahiruLaunchpad.TOTAL_SUPPLY();
+      const contractTotalSupply = await rabbitLaunchpad.TOTAL_SUPPLY();
       expect(contractTotalSupply).to.equal(DEFAULT_TEST_PARAMS.TOTAL_SUPPLY);
     });
 
     it("Should use correct graduation allocation from contract", async function () {
-      const contractAllocation = await ahiruLaunchpad.GRADUATION_TOKEN_ALLOCATION();
+      const contractAllocation = await rabbitLaunchpad.GRADUATION_TOKEN_ALLOCATION();
       expect(contractAllocation).to.equal(DEFAULT_TEST_PARAMS.GRADUATION_TOKEN_ALLOCATION);
     });
   });

@@ -46,6 +46,6 @@ describe("${testName}", function () {
 }
 
 // Example usage:
-// generateTestTemplate("AhiruLaunchpad", "AhiruLaunchpad - Basic Tests");
+// generateTestTemplate("RabbitLaunchpad", "RabbitLaunchpad - Basic Tests");
 
 module.exports = { generateTestTemplate };
