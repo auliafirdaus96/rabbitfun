@@ -122,5 +122,6 @@
     "bsc"
   ],
   "author": "Rabbit Launchpad Team",
-  "license": "MIT"
+  "license": "MIT",
+  "postinstall": "npx prisma generate"
 }
