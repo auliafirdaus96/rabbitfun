@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useWeb3 } from './useWeb3';
 import { useApi } from './useApi';
 import * as useReactQuery from './useReactQuery';
@@ -61,8 +62,8 @@ export function useTokenData(tokenAddress: string, options: UseTokenDataOptions 
         if (data.tokenAddress === tokenAddress) {
           // Refresh token info when new transaction occurs
           // This will trigger React Query to refetch
-          const queryClient = useReactQuery.useQueryClient();
-          queryClient.invalidateQueries(useReactQuery.queryKeys.token(tokenAddress));
+          const queryClient = useQueryClient();
+          queryClient.invalidateQueries({ queryKey: ['token', tokenAddress] });
         }
       };
 
@@ -110,12 +111,12 @@ export function useTokenData(tokenAddress: string, options: UseTokenDataOptions 
 
   // Refetch function
   const refetch = async () => {
-    const queryClient = useReactQuery.useQueryClient();
+    const queryClient = useQueryClient();
 
     // Refetch all related queries
     await Promise.all([
-      queryClient.invalidateQueries(useReactQuery.queryKeys.token(tokenAddress)),
-      queryClient.invalidateQueries(useReactQuery.queryKeys.tokenAnalytics(tokenAddress))
+      queryClient.invalidateQueries({ queryKey: ['token', tokenAddress] }),
+      queryClient.invalidateQueries({ queryKey: ['tokenAnalytics', tokenAddress] })
     ]);
 
     // Reload balances
@@ -267,8 +268,8 @@ export function useMarketData() {
 
     const handleMarketUpdate = (data: any) => {
       // Refresh market stats when update received
-      const queryClient = useReactQuery.useQueryClient();
-      queryClient.invalidateQueries(useReactQuery.queryKeys.marketStats);
+      const queryClient = useQueryClient();
+      queryClient.invalidateQueries({ queryKey: ['marketStats'] });
     };
 
     webSocketService.on('market_update', handleMarketUpdate);

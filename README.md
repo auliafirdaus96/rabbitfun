@@ -25,23 +25,51 @@ Rabbit Launchpad is a decentralized platform for creating and trading tokens wit
 
 ```
 rabbit/
-├── backend/                 # Backend API server
+├── backend/                 # Backend API server (Node.js + Express)
 │   ├── src/
 │   │   ├── server.ts       # Main server file
-│   │   ├── services/       # Business logic
-│   │   └── utils/          # Utilities
+│   │   ├── controllers/    # API controllers
+│   │   ├── services/       # Business logic services
+│   │   ├── middleware/     # Express middleware
+│   │   ├── routes/         # API route definitions
+│   │   ├── models/         # Database models
+│   │   ├── utils/          # Utility functions
+│   │   └── types/          # TypeScript types
+│   ├── prisma/             # Database schema and migrations
+│   ├── tests/              # Backend test suite
 │   └── package.json
-├── frontend/               # React frontend
+├── frontend/               # React frontend (TypeScript + Vite)
 │   ├── src/
 │   │   ├── components/     # React components
+│   │   │   ├── ui/         # Reusable UI components
+│   │   │   ├── forms/      # Form components
+│   │   │   └── layout/     # Layout components
 │   │   ├── pages/          # Page components
-│   │   ├── hooks/          # Custom hooks
-│   │   └── utils/          # Utility functions
+│   │   │   ├── InvestorPage.tsx
+│   │   │   ├── InvestorLanding.tsx
+│   │   │   └── Launchpad.tsx
+│   │   ├── hooks/          # Custom React hooks
+│   │   │   ├── useTokenData.ts
+│   │   │   ├── useReactQuery.ts
+│   │   │   └── useWeb3.ts
+│   │   ├── services/       # API and Web3 services
+│   │   ├── utils/          # Utility functions
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── styles/         # Global styles
+│   ├── public/             # Static assets
+│   ├── tests/              # Frontend test suite
 │   └── package.json
-└── smartcontract/          # Smart contracts
-    ├── contracts/          # Solidity contracts
-    ├── scripts/            # Deployment scripts
-    └── hardhat.config.ts
+├── smartcontract/          # Smart contracts (Solidity + Hardhat)
+│   ├── contracts/          # Solidity contract files
+│   │   └── RabbitLaunchpad.sol
+│   ├── scripts/            # Deployment and utility scripts
+│   ├── test/               # Contract test files
+│   ├── client/             # TypeChain client types
+│   └── hardhat.config.ts
+└── docs/                   # Project documentation
+    ├── api/                # API documentation
+    ├── guides/             # User guides
+    └── deployment/         # Deployment guides
 ```
 
 ## 🚀 Quick Start

@@ -30,7 +30,6 @@
     "test:db:setup": "chmod +x scripts/setup-test-db.sh && ./scripts/setup-test-db.sh",
     "test:db:cleanup": "chmod +x scripts/cleanup-test-db.sh && ./scripts/cleanup-test-db.sh",
     "test:db:seed": "ts-node prisma/seed-test.ts",
-    "test:db:cleanup": "chmod +x scripts/cleanup-test-db.sh && ./scripts/cleanup-test-db.sh",
     "test:performance": "node scripts/performance-test.js",
     "test:load": "node scripts/performance-test.js load",
     "test:stress": "node scripts/performance-test.js stress",
@@ -50,6 +49,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "axios": "^1.5.0",
     "bcrypt": "^5.1.1",
     "bull": "^4.11.3",
@@ -75,6 +76,8 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "sqlite3": "^5.1.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
   },

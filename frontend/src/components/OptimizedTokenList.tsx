@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { VirtualizedTokenList, useInfiniteScroll } from './VirtualizedTokenList';
 import { TrendingTokenCard } from './TrendingTokenCard';
 import { FeaturedTokenCard } from './FeaturedTokenCard';
 import { cache } from '@/utils/cache';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, ChevronDown, Star, TrendingUp } from 'lucide-react';
 import type { TokenInfo } from '@/types/api';
-import { convertToTrendingToken, convertToFeaturedToken, getFeaturedTokens, getTrendingTokens } from '@/utils/tokenAdapter';
+import { getFeaturedTokens, getTrendingTokens } from '@/utils/tokenAdapter';
 
 interface OptimizedTokenListProps {
   onLike: (tokenId: string) => void;
@@ -17,6 +16,9 @@ interface OptimizedTokenListProps {
   className?: string;
   showFilters?: boolean;
 }
+
+// Feature flag for using real API vs mock data
+const USE_REAL_API = true; // Force real API for testing
 
 // Generate realistic dummy token data
 const generateDummyTokens = (count: number = 20): TokenInfo[] => {
@@ -38,8 +40,7 @@ const generateDummyTokens = (count: number = 20): TokenInfo[] => {
     const soldSupply = Math.floor(Math.random() * 900000000) + 100000000; // 100M - 1B
     const totalBNB = Math.floor(Math.random() * 500) + 10; // 10 - 510 BNB
     const initialPrice = parseFloat((Math.random() * 0.001 + 0.0001).toFixed(6)); // 0.0001 - 0.001
-    const currentPrice = totalBNB > 0 && soldSupply > 0 ? totalBNB / soldSupply : initialPrice;
-
+  
     return {
       tokenAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
       name: tokenNames[index % tokenNames.length],
@@ -62,7 +63,43 @@ const generateDummyTokens = (count: number = 20): TokenInfo[] => {
   });
 };
 
-// Fetch tokens with caching
+// Real API fetch tokens function
+const fetchRealTokens = async (page: number = 1, limit: number = 50, filters?: any): Promise<{
+  tokens: TokenInfo[];
+  total: number;
+  page: number;
+  totalPages: number;
+}> => {
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(filters?.sortBy && { sortBy: filters.sortBy }),
+      ...(filters?.order && { order: filters.order }),
+      ...(filters?.minVolume && { minVolume: filters.minVolume.toString() }),
+      ...(filters?.minMarketCap && { minMarketCap: filters.minMarketCap.toString() })
+    });
+
+    const response = await fetch(`http://localhost:3004/api/tokens?${params}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch real tokens:', error);
+    throw error;
+  }
+};
+
+// Fetch tokens with caching (supports both real and mock)
 const fetchTokens = async (page: number = 1, limit: number = 50, filters?: any): Promise<{
   tokens: TokenInfo[];
   total: number;
@@ -82,7 +119,18 @@ const fetchTokens = async (page: number = 1, limit: number = 50, filters?: any):
     };
   }
 
-  // Generate realistic dummy data
+  try {
+    // Try real API first if enabled
+    if (USE_REAL_API) {
+      const realData = await fetchRealTokens(page, limit, filters);
+      cache.set(cacheKey, realData, 30 * 1000); // Cache for 30 seconds
+      return realData;
+    }
+  } catch (error) {
+    console.warn('Real API failed, falling back to mock data:', error);
+  }
+
+  // Fallback to mock data
   const allTokens = generateDummyTokens(50); // Total 50 dummy tokens
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
@@ -207,22 +255,7 @@ export const OptimizedTokenList: React.FC<OptimizedTokenListProps> = ({
     refetchOnWindowFocus: false
   });
 
-  // Preload images (disabled for now since imageUrl doesn't exist in TokenInfo)
-  // useEffect(() => {
-  //   if (tokensData?.tokens) {
-  //     const imageUrls = tokensData.tokens
-  //       .map(token => (token as any).imageUrl)
-  //       .filter(Boolean)
-  //       .slice(0, 20); // Preload first 20 images
-
-  //     if (imageUrls.length > 0) {
-  //       import('@/utils/cache').then(({ imageCache }) => {
-  //         imageCache.preload(imageUrls);
-  //       });
-  //     }
-  //   }
-  // }, [tokensData?.tokens]);
-
+  
   // Memoized handlers
   const handleSortChange = useCallback((newSortBy: string, newOrder: 'asc' | 'desc') => {
     setSortBy(newSortBy);
@@ -448,18 +481,18 @@ export const OptimizedTokenList: React.FC<OptimizedTokenListProps> = ({
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
                 <h2 className="text-xl font-bold">Featured Tokens</h2>
               </div>
-              <div className="flex flex-col lg:flex-row gap-6 justify-center">
+              <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 justify-center items-center lg:items-stretch px-2 sm:px-0">
                 {isLoadingTrending ? (
                   // Featured skeleton
                   Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="min-w-[600px] animate-pulse">
-                      <div className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 rounded-3xl p-8">
-                        <div className="flex gap-6">
-                          <div className="w-32 h-32 bg-neutral-700 rounded-2xl"></div>
+                    <div key={index} className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl animate-pulse">
+                      <div className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 rounded-3xl p-4 sm:p-6 lg:p-8">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                          <div className="w-24 h-24 sm:w-32 sm:h-32 bg-neutral-700 rounded-2xl mx-auto sm:mx-0"></div>
                           <div className="flex-1 space-y-4">
                             <div className="h-8 bg-neutral-700 rounded w-1/3"></div>
                             <div className="h-4 bg-neutral-700 rounded w-1/4"></div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                               <div className="h-16 bg-neutral-700 rounded-xl"></div>
                               <div className="h-16 bg-neutral-700 rounded-xl"></div>
                             </div>
@@ -470,7 +503,7 @@ export const OptimizedTokenList: React.FC<OptimizedTokenListProps> = ({
                   ))
                 ) : (
                   featuredTokens.map((token) => (
-                    <div key={token.id} className="flex justify-center">
+                    <div key={token.id} className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl">
                       <FeaturedTokenCard
                         token={token}
                       />

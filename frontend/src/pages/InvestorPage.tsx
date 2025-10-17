@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
   TrendingUp,
   Shield,
@@ -145,10 +144,7 @@ const InvestorPage = () => {
       <section className="relative overflow-hidden pt-20 pb-32">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
             className="text-center"
           >
             <div className="inline-flex items-center px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-full mb-6">
@@ -178,11 +174,8 @@ const InvestorPage = () => {
             {/* Progress Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {metrics.map((metric, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
                   className="bg-white/10 backdrop-blur-lg rounded-lg p-4 border border-white/20"
                 >
                   <div className="text-3xl font-bold mb-2">{metric.value}</div>
@@ -193,10 +186,10 @@ const InvestorPage = () => {
                       style={{ width: metric.value }}
                     />
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -225,10 +218,7 @@ const InvestorPage = () => {
       {activeTab === 'overview' && (
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
+            <div
             >
               <h2 className="text-4xl font-bold text-center mb-16">Project Overview</h2>
 
@@ -302,20 +292,17 @@ const InvestorPage = () => {
                     description: "Comprehensive security scanning, monitoring, and best practices implementation."
                   }
                 ].map((feature, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:bg-white/15 transition-all"
                   >
                     <div className="text-purple-400 mb-4">{feature.icon}</div>
                     <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
                     <p className="text-gray-300">{feature.description}</p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
@@ -324,26 +311,20 @@ const InvestorPage = () => {
       {activeTab === 'achievements' && (
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
+            <div
             >
               <h2 className="text-4xl font-bold text-center mb-16">Technical Achievements</h2>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {achievements.map((achievement, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-xl p-6 border border-purple-500/30 hover:border-purple-400/50 transition-all"
                   >
                     <div className="text-purple-400 mb-4">{achievement.icon}</div>
                     <h3 className="text-xl font-bold mb-3">{achievement.title}</h3>
                     <p className="text-gray-300">{achievement.description}</p>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
@@ -364,7 +345,7 @@ const InvestorPage = () => {
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
@@ -373,20 +354,14 @@ const InvestorPage = () => {
       {activeTab === 'technical' && (
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
+            <div
             >
               <h2 className="text-4xl font-bold text-center mb-16">Technical Specifications</h2>
 
               <div className="grid md:grid-cols-2 gap-8">
                 {technicalSpecs.map((spec, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
                     className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
                   >
                     <h3 className="text-xl font-bold mb-4 text-purple-400">{spec.category}</h3>
@@ -398,7 +373,7 @@ const InvestorPage = () => {
                         </li>
                       ))}
                     </ul>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
@@ -420,7 +395,7 @@ const InvestorPage = () => {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
@@ -429,10 +404,7 @@ const InvestorPage = () => {
       {activeTab === 'timeline' && (
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
+            <div
             >
               <h2 className="text-4xl font-bold text-center mb-16">Development Timeline</h2>
 
@@ -440,11 +412,8 @@ const InvestorPage = () => {
                 <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-600 to-blue-600" />
 
                 {timeline.map((phase, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.2 }}
                     className={`relative flex items-center mb-12 ${
                       index % 2 === 0 ? 'justify-start' : 'justify-end'
                     }`}
@@ -466,7 +435,7 @@ const InvestorPage = () => {
                     </div>
 
                     <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-purple-600 rounded-full border-4 border-slate-900" />
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
@@ -482,7 +451,7 @@ const InvestorPage = () => {
                   Schedule Investor Meeting
                 </button>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
@@ -490,10 +459,7 @@ const InvestorPage = () => {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+          <div
           >
             <h2 className="text-4xl font-bold mb-6">Ready to Transform Token Launches</h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
@@ -509,7 +475,7 @@ const InvestorPage = () => {
                 Explore Live Platform
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

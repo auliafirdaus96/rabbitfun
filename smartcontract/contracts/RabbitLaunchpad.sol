@@ -203,7 +203,7 @@ contract RabbitLaunchpad is Ownable, ReentrancyGuard {
         uint256 bnbForTokens = msg.value - totalFee;
 
         // Hitung jumlah token yang akan dibeli menggunakan bonding curve
-        uint256 tokenAmount = calculateTokenPurchase(tokenState.soldSupply, bnbForTokens, tokenState.initialPrice, 0);
+        uint256 tokenAmount = calculateTokenPurchase(tokenState.soldSupply, bnbForTokens, tokenState.initialPrice, K_FACTOR);
 
         require(tokenAmount > 0, "Insufficient BNB for token purchase");
         require(tokenState.soldSupply + tokenAmount <= TOTAL_SUPPLY - GRADUATION_TOKEN_ALLOCATION, "Not enough tokens available");
@@ -248,7 +248,7 @@ contract RabbitLaunchpad is Ownable, ReentrancyGuard {
         require(tokenState.soldSupply >= tokenAmount, "Cannot sell more than sold supply");
 
         // Hitung BNB yang akan diterima menggunakan bonding curve
-        uint256 bnbAmount = calculateTokenSale(tokenState.soldSupply, tokenAmount, tokenState.initialPrice, 0);
+        uint256 bnbAmount = calculateTokenSale(tokenState.soldSupply, tokenAmount, tokenState.initialPrice, K_FACTOR);
 
         require(bnbAmount > 0, "Token amount too small");
         require(address(this).balance >= bnbAmount, "Insufficient BNB in contract");

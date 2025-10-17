@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+;
 import {
   ArrowRight,
   Play,
@@ -131,27 +131,18 @@ const InvestorLanding = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-blue-600/10" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+          <div
           >
             {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+            <div
               className="inline-flex items-center px-4 py-2 bg-green-500/20 border border-green-500/50 rounded-full mb-8"
             >
               <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
               <span className="text-green-400 font-medium">85% Production Ready • Seeking Strategic Investors</span>
-            </motion.div>
+            </div>
 
             {/* Main Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+            <h1
               className="text-5xl md:text-7xl font-bold mb-6"
             >
               <span className="bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
@@ -161,23 +152,17 @@ const InvestorLanding = () => {
               <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Token Launch Platform
               </span>
-            </motion.h1>
+            </h1>
 
             {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+            <p
               className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto"
             >
               Professional DeFi infrastructure with comprehensive security, 95% test coverage, and enterprise development standards
-            </motion.p>
+            </p>
 
             {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+            <div
               className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
             >
               <button className="group px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105">
@@ -189,13 +174,10 @@ const InvestorLanding = () => {
                 <Play className="w-5 h-5 inline mr-2" />
                 Watch Platform Demo
               </button>
-            </motion.div>
+            </div>
 
             {/* Stats Grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
+            <div
               className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
             >
               {stats.map((stat, index) => (
@@ -206,29 +188,22 @@ const InvestorLanding = () => {
                   <div className="text-sm text-gray-300">{stat.label}</div>
                 </div>
               ))}
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
 
         {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1 }}
+        <div
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         >
           <ChevronDown className="w-6 h-6 text-gray-400 animate-bounce" />
-        </motion.div>
+        </div>
       </section>
 
       {/* Features Section */}
       <section id="features" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <div
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -239,16 +214,12 @@ const InvestorLanding = () => {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Built with professional development practices that exceed industry standards
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
                 className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-2xl p-8 border border-purple-500/30 hover:border-purple-400/50 transition-all group"
               >
                 <div className="text-purple-400 mb-6 group-hover:scale-110 transition-transform">
@@ -257,7 +228,7 @@ const InvestorLanding = () => {
                 <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
                 <p className="text-gray-300 mb-4">{feature.description}</p>
                 <div className="text-sm text-purple-400 font-medium">{feature.highlight}</div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -266,11 +237,7 @@ const InvestorLanding = () => {
       {/* Technology Stack */}
       <section id="tech" className="py-20 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <div
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -281,7 +248,7 @@ const InvestorLanding = () => {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Enterprise-grade infrastructure built with industry-leading technologies
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -302,12 +269,8 @@ const InvestorLanding = () => {
                 items: ["Docker", "GitHub Actions", "Security Scanning", "Performance Monitoring", "Automated Testing"]
               }
             ].map((category, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
                 className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
               >
                 <h3 className="text-xl font-bold mb-4 text-purple-400">{category.title}</h3>
@@ -319,7 +282,7 @@ const InvestorLanding = () => {
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -328,11 +291,7 @@ const InvestorLanding = () => {
       {/* Investment Metrics */}
       <section id="metrics" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <div
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -343,7 +302,7 @@ const InvestorLanding = () => {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Quantified achievements demonstrating production readiness and market potential
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {[
@@ -352,28 +311,20 @@ const InvestorLanding = () => {
               { value: "0", label: "Security Issues", color: "from-purple-400 to-purple-600" },
               { value: "<200ms", label: "Response Time", color: "from-yellow-400 to-yellow-600" }
             ].map((metric, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
                 className="text-center"
               >
                 <div className={`text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r ${metric.color} bg-clip-text text-transparent`}>
                   {metric.value}
                 </div>
                 <div className="text-gray-300">{metric.label}</div>
-              </motion.div>
+              </div>
             ))}
           </div>
 
           {/* Development Status */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <div
             className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-2xl p-8 border border-purple-500/30"
           >
             <h3 className="text-2xl font-bold mb-6 text-center">Development Status</h3>
@@ -412,18 +363,14 @@ const InvestorLanding = () => {
                 </ul>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Testimonials */}
       <section className="py-20 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <div
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -431,16 +378,12 @@ const InvestorLanding = () => {
                 Expert Recognition
               </span>
             </h2>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {testimonials.map((testimonial, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
                 className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
               >
                 <div className="flex mb-4">
@@ -453,7 +396,7 @@ const InvestorLanding = () => {
                   <div className="font-semibold">{testimonial.name}</div>
                   <div className="text-sm text-gray-400">{testimonial.role}</div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -462,11 +405,7 @@ const InvestorLanding = () => {
       {/* Final CTA */}
       <section id="contact" className="py-20 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+          <div
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Ready to Transform DeFi?
@@ -485,7 +424,7 @@ const InvestorLanding = () => {
                 Download Investment Deck
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

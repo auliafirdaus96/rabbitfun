@@ -105,7 +105,7 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
   return (
     <div
       onClick={handleClick}
-      className={`relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white rounded-3xl p-8 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer border border-neutral-700/50 hover:border-purple-500/30 min-w-[600px] ${
+      className={`relative bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white rounded-3xl p-3 sm:p-4 md:p-6 lg:p-8 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer border border-neutral-700/50 hover:border-purple-500/30 w-full max-w-[calc(100vw-2rem)] sm:max-w-sm md:max-w-md lg:max-w-2xl mx-auto overflow-hidden ${
         isHovered ? 'transform hover:-translate-y-1' : ''
       } ${
         isNavigating ? 'opacity-75 scale-95' : ''
@@ -146,9 +146,9 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
 
       <div className="relative z-10">
         {/* Header Section */}
-        <div className="flex gap-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
           {/* Logo Area */}
-          <div className="w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-800 border-2 border-neutral-700 shadow-xl relative">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden flex-shrink-0 bg-neutral-800 border-2 border-neutral-700 shadow-xl relative mx-auto sm:mx-0">
             {!imageError ? (
               <img
                 src={token.image_url || getPlaceholderImage(token.name, token.ticker)}
@@ -175,11 +175,11 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
           </div>
 
           {/* Info Area */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-center sm:text-left">
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-white mb-2">{token.name}</h2>
-              <p className="text-base font-medium text-gray-300 mb-2">{token.ticker}</p>
-              <div className="flex items-center gap-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">{token.name}</h2>
+              <p className="text-sm sm:text-base font-medium text-gray-300 mb-2">{token.ticker}</p>
+              <div className="flex items-center justify-center sm:justify-start gap-1 flex-wrap">
                 <span className="text-sm text-gray-400">by</span>
                 <CreatorLink
                   creatorName={token.creator}
@@ -191,7 +191,7 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="bg-neutral-800/50 rounded-xl p-3 border border-neutral-700/30">
                 <div className="text-xs text-gray-400 mb-1">Market Cap</div>
                 <div className="text-lg font-bold text-white">{formatMarketCap(token.market_cap)}</div>
@@ -242,8 +242,8 @@ export const FeaturedTokenCard = ({ token }: FeaturedTokenCardProps) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+          <div className="flex items-center gap-4 flex-wrap justify-center">
             <div className="text-xs text-gray-400">
               <span className="font-mono bg-neutral-800/50 px-2 py-1 rounded border border-neutral-700/30">
                 {token.contract_address.slice(0, 8)}...{token.contract_address.slice(-6)}

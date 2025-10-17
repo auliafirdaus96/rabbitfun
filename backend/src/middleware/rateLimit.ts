@@ -254,6 +254,33 @@ export const uploadLimiter = rateLimit({
   }
 });
 
+// Authentication rate limiter (strict)
+export const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: 20, // 20 auth attempts per 15 menit per IP
+  message: {
+    error: 'Too many authentication attempts. Please try again later.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req: Request, res: Response) => {
+    logger.warn('Authentication rate limit exceeded', {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      path: req.path,
+      method: req.method
+    });
+
+    res.status(429).json({
+      success: false,
+      error: RATE_LIMIT_CONFIGS.upload.message.error,
+      retryAfter: '15 minutes',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Middleware untuk dynamic rate limiting berdasarkan user tier (future implementation)
 export const createUserTierLimiter = (tier: 'basic' | 'premium' | 'enterprise') => {
   const limits = {

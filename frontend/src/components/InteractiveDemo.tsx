@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+;
 import {
   Play,
   Pause,
@@ -169,11 +169,8 @@ const InteractiveDemo = () => {
             <span>{Math.round(((currentStep + 1) / currentDemo?.steps.length) * 100)}%</span>
           </div>
           <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-            <motion.div
+            <div
               className="h-full bg-gradient-to-r from-purple-600 to-blue-600"
-              initial={{ width: 0 }}
-              animate={{ width: `${((currentStep + 1) / currentDemo?.steps.length) * 100}%` }}
-              transition={{ duration: 0.5 }}
             />
           </div>
         </div>
@@ -181,14 +178,12 @@ const InteractiveDemo = () => {
         {/* Steps Display */}
         <div className="space-y-3">
           {currentDemo?.steps.map((step, index) => (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, x: -20 }}
               animate={{
                 opacity: index <= currentStep ? 1 : 0.3,
                 x: index <= currentStep ? 0 : -20
               }}
-              transition={{ duration: 0.3 }}
               className={`flex items-center space-x-3 p-3 rounded-lg ${
                 index === currentStep
                   ? 'bg-purple-600/20 border border-purple-500/50'
@@ -211,16 +206,13 @@ const InteractiveDemo = () => {
                 <div className="text-sm text-gray-400">{step.description}</div>
               </div>
               {index === currentStep && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.3 }}
+                <div
                   className="text-purple-400"
                 >
                   <ArrowRight className="w-5 h-5" />
-                </motion.div>
+                </div>
               )}
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -228,11 +220,8 @@ const InteractiveDemo = () => {
       {/* Live Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {metrics.map((metric, index) => (
-          <motion.div
+          <div
             key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
             className="bg-white/5 rounded-lg p-3 border border-gray-700"
           >
             <div className="flex items-center justify-between mb-1">
@@ -247,7 +236,7 @@ const InteractiveDemo = () => {
             </div>
             <div className="text-lg font-bold text-white">{metric.value}</div>
             <div className="text-xs text-gray-400">{metric.label}</div>
-          </motion.div>
+          </div>
         ))}
       </div>
 

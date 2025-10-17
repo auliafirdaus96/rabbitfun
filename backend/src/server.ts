@@ -136,12 +136,12 @@ app.get('/health', async (_req, res) => {
 const blockchainService = new BlockchainService();
 
 // API Routes with specific rate limiting
-app.use('/api/auth', apiLimiter, authRoutes);
-app.use('/api/users', apiLimiter, userRoutes);
-app.use('/api/portfolio', apiLimiter, portfolioRoutes);
-app.use('/api/notifications', apiLimiter, notificationRoutes);
-app.use('/api/admin', apiLimiter, adminRoutes);
-app.use('/api/tokens', apiLimiter, tokenCreationLimiter, tokenRoutes);
+// app.use('/api/auth', apiLimiter, authRoutes);
+// app.use('/api/users', apiLimiter, userRoutes);
+// app.use('/api/portfolio', apiLimiter, portfolioRoutes);
+// app.use('/api/notifications', apiLimiter, notificationRoutes);
+// app.use('/api/admin', apiLimiter, adminRoutes);
+app.use('/api/tokens', apiLimiter, tokenRoutes);
 app.use('/api/analytics', analyticsLimiter, analyticsRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/bonding-curve', tradingLimiter, bondingCurveRoutes);
