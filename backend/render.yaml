@@ -1,0 +1,30 @@
+services:
+  # Backend API Service
+  - type: web
+    name: rabbit-backend
+    env: node
+    plan: free
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+    autoDeploy: true
+
+  # PostgreSQL Database
+  - type: pserv
+    name: rabbit-postgres
+    plan: free
+    env: docker
+    databaseName: rabbit_launchpad
+    user: rabbit_user
+
+  # Redis Cache
+  - type: redis
+    name: rabbit-redis
+    plan: free
+    ipAllowList: [] # Only allow internal connections

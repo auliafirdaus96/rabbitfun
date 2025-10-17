@@ -2,11 +2,11 @@
   "name": "rabbit-launchpad-backend",
   "version": "1.0.0",
   "description": "Backend API for Rabbit Launchpad",
-  "main": "dist/server.js",
+  "main": "src/server.ts",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
+    "build": "npm install && echo 'Backend build completed'",
+    "start": "ts-node -r tsconfig-paths/register src/server.ts",
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
     "db:seed": "ts-node prisma/seed.ts",
@@ -78,6 +78,8 @@
     "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
   },
