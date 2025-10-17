@@ -10,6 +10,18 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/tokens-db.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/transactions.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/users.ts",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/auth.ts",
       "use": "@vercel/node"
     },
@@ -26,6 +38,18 @@
     {
       "src": "/api/tokens",
       "dest": "api/tokens.ts"
+    },
+    {
+      "src": "/api/tokens-db",
+      "dest": "api/tokens-db.ts"
+    },
+    {
+      "src": "/api/transactions",
+      "dest": "api/transactions.ts"
+    },
+    {
+      "src": "/api/users",
+      "dest": "api/users.ts"
     },
     {
       "src": "/api/auth",
