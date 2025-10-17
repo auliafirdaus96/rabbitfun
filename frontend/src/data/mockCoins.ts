@@ -181,10 +181,10 @@ export const mockCoins: MockCoin[] = [
   },
   {
     id: "0x1111111111111111111111111111111111111111111",
-    name: "PepeVibes",
-    ticker: "PEPEV",
+    name: "Unity Token",
+    ticker: "UNITY",
     image: "",
-    logo: "PEPEV",
+    logo: "UNITY",
     contractAddress: "0x1111111111111111111111111111111111111111111",
     contract: "0x1111111111111111111111111111111111111111111",
     marketCap: "13.46M",
@@ -201,10 +201,10 @@ export const mockCoins: MockCoin[] = [
   // Active bonding tokens (medium progress, various price changes)
   {
     id: "0x2222222222222222222222222222222222222222222",
-    name: "ShibaShark",
-    ticker: "SHIBSHARK",
+    name: "Binary Token",
+    ticker: "BINARY",
     image: "",
-    logo: "SHIBSHARK",
+    logo: "BINARY",
     contractAddress: "0x2222222222222222222222222222222222222222222",
     contract: "0x2222222222222222222222222222222222222222222",
     marketCap: "800K",
@@ -219,10 +219,10 @@ export const mockCoins: MockCoin[] = [
   },
   {
     id: "0x3333333333333333333333333333333333333333333",
-    name: "TurboMeme",
-    ticker: "TURBO",
+    name: "Triplet Token",
+    ticker: "TRIPLE",
     image: "",
-    logo: "TURBO",
+    logo: "TRIPLE",
     contractAddress: "0x3333333333333333333333333333333333333333333",
     contract: "0x3333333333333333333333333333333333333333333",
     marketCap: "11.66M",
@@ -237,10 +237,10 @@ export const mockCoins: MockCoin[] = [
   },
   {
     id: "0x4444444444444444444444444444444444444",
-    name: "CosmicCat",
-    ticker: "COSMIC",
+    name: "Quadrant Token",
+    ticker: "QUAD",
     image: "",
-    logo: "COSMIC",
+    logo: "QUAD",
     contractAddress: "0x4444444444444444444444444444444444444",
     contract: "0x4444444444444444444444444444444444444",
     marketCap: "5.33M",
@@ -346,6 +346,26 @@ export const mockCoins: MockCoin[] = [
     creatorId: "0x0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
     creatorName: "RabbitFun Platform",
     creatorAvatar: "https://picsum.photos/seed/rabbitfun/200/200.jpg"
+  },
+
+  // Bakpao Token - Successfully Tested Token
+  {
+    id: "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+    name: "Bakpao Token",
+    ticker: "BAKPAO",
+    image: "",
+    logo: "🥟", // Bakpao emoji
+    contractAddress: "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+    contract: "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be",
+    marketCap: "0.05K",
+    progress: 0.14,
+    priceChange: 25.8,
+    bnbCollected: "0.049",
+    isLive: true,
+    created_at: 'Just now', // Simple format
+    creatorId: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", // Deployer address from test
+    creatorName: "Test Creator",
+    creatorAvatar: "https://picsum.photos/seed/bakpao-creator/200/200.jpg"
   }
 ];
 

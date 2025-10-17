@@ -163,21 +163,81 @@ const TokenDetail = () => {
     let ticker: string;
 
     if (address && address.length >= 6) {
-      // Extract meaningful part of address for name (skip "0x")
-      const meaningfulPart = address.slice(2, 6);
-      // Use first 3 chars for ticker if available
-      const tickerPart = address.slice(2, 5);
+      // Check for common test address patterns with repeating numbers (be more strict)
+      const addressLower = address.toLowerCase();
+      const firstEight = addressLower.slice(2, 10); // Get first 8 chars after "0x"
 
-      name = `Token ${meaningfulPart.toUpperCase()}`;
-      ticker = tickerPart.toUpperCase();
+      // Check if it's a very obvious repeating pattern like "11111111", "22222222", etc.
+      // Only match if at least 6 of the first 8 chars are the same digit
+      if (/^([0-9a-f])\1{5,}/.test(firstEight)) {
+        const firstChar = firstEight[0];
+        switch(firstChar) {
+          case '1':
+            name = "Unity Token";
+            ticker = "UNITY";
+            break;
+          case '2':
+            name = "Binary Token";
+            ticker = "BINARY";
+            break;
+          case '3':
+            name = "Triplet Token";
+            ticker = "TRIPLE";
+            break;
+          case '4':
+            name = "Quadrant Token";
+            ticker = "QUAD";
+            break;
+          case '5':
+            name = "Penta Token";
+            ticker = "PENTA";
+            break;
+          case '6':
+            name = "Hexa Token";
+            ticker = "HEXA";
+            break;
+          case '7':
+            name = "Septa Token";
+            ticker = "SEPTA";
+            break;
+          case '8':
+            name = "Octa Token";
+            ticker = "OCTA";
+            break;
+          case '9':
+            name = "Nova Token";
+            ticker = "NOVA";
+            break;
+          case '0':
+            name = "Origin Token";
+            ticker = "ORIGIN";
+            break;
+          default:
+            // Fallback for other repeating patterns
+            name = `Echo Token ${firstChar.toUpperCase()}`;
+            ticker = `ECHO${firstChar.toUpperCase()}`;
+        }
+      } else {
+        // Extract meaningful part of address for name (skip "0x")
+        const meaningfulPart = address.slice(2, 6);
+        // Use first 3 chars for ticker if available
+        const tickerPart = address.slice(2, 5);
+
+        // Ensure ticker is not just zeros or common patterns
+        if (tickerPart === "000" || tickerPart === "00" || tickerPart === "0") {
+          ticker = "NEW";
+          name = "New Token";
+        } else if (meaningfulPart === "0000") {
+          name = "Genesis Token";
+          ticker = "GENESIS";
+        } else {
+          name = `Token ${meaningfulPart.toUpperCase()}`;
+          ticker = tickerPart.toUpperCase();
+        }
+      }
     } else {
       // Fallback for invalid/empty addresses
       name = "New Token";
-      ticker = "NEW";
-    }
-
-    // Ensure ticker is not just zeros
-    if (ticker === "000" || ticker === "00" || ticker === "0") {
       ticker = "NEW";
     }
 
@@ -266,7 +326,9 @@ const TokenDetail = () => {
     }
   }, [displayToken]);
 
-  // Handle buy/sell actions through integration hook
+  // Handle buy/sell actions through Web3 hook
+  const { buyTokens, sellTokens } = useWeb3();
+
   const handleBuy = useCallback(async () => {
     if (!fromAmount) {
       toast.error('Please enter an amount');
@@ -274,14 +336,20 @@ const TokenDetail = () => {
     }
 
     try {
-      await buyToken(fromAmount);
+      if (!contractAddress) {
+        toast.error('Token address not available');
+        return;
+      }
+
+      await buyTokens(contractAddress, fromAmount);
       setFromAmount("");
       setToAmount("");
+      toast.success('Purchase successful!');
     } catch (error: any) {
       console.error('Buy failed:', error);
       toast.error(error.message || 'Buy failed');
     }
-  }, [fromAmount, buyToken]);
+  }, [fromAmount, buyTokens, contractAddress]);
 
   const handleSell = useCallback(async () => {
     if (!fromAmount) {
@@ -290,14 +358,20 @@ const TokenDetail = () => {
     }
 
     try {
-      await sellToken(fromAmount);
+      if (!contractAddress) {
+        toast.error('Token address not available');
+        return;
+      }
+
+      await sellTokens(contractAddress, fromAmount);
       setFromAmount("");
       setToAmount("");
+      toast.success('Sale successful!');
     } catch (error: any) {
       console.error('Sell failed:', error);
       toast.error(error.message || 'Sell failed');
     }
-  }, [fromAmount, sellToken]);
+  }, [fromAmount, sellTokens, contractAddress]);
 
   // Wallet connection (simplified)
   const [walletAddress, setWalletAddress] = useState<string>("");

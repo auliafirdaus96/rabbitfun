@@ -319,11 +319,12 @@ export const useWeb3 = () => {
       throw new Error('Contract not available');
     }
 
+    // Note: Smart contract ignores initialPrice and slope parameters, uses internal constants
     const tokenAmount = await launchpadContract.calculateTokenPurchase(
       parseEther(currentSupply),
       parseEther(bnbAmount),
       parseEther(initialPrice),
-      slope
+      slope // This is K_FACTOR (543) but contract uses its internal constant
     );
 
     return formatEther(tokenAmount);
