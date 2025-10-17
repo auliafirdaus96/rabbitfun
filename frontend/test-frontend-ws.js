@@ -1,1 +1,0 @@
-const ws = new WebSocket("ws://localhost:8081"); ws.onopen = () => { console.log("Connected to WebSocket from frontend\!"); ws.send(JSON.stringify({type: "test", data: "Hello from frontend\!"})); }; ws.onmessage = (e) => console.log("Received:", JSON.parse(e.data)); ws.onclose = () => console.log("Disconnected"); setTimeout(() => ws.close(), 2000);
