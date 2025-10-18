@@ -10,6 +10,7 @@ export const TrendingProjects = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Convert MockCoin data to match TrendingTokenCard interface
   const convertCoinToToken = (coin: any) => ({
@@ -48,6 +49,17 @@ export const TrendingProjects = () => {
       return () => container.removeEventListener('scroll', checkScroll);
     }
   }, [filteredProjects]);
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const scrollLeft = () => {
     const container = scrollContainerRef.current;
@@ -92,9 +104,9 @@ export const TrendingProjects = () => {
               {/* Left Navigation Arrow */}
               <button
                 onClick={scrollLeft}
-                className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-card/90 backdrop-blur-sm rounded-full border border-black sm:flex hidden items-center justify-center transition-all duration-200 hover:bg-card hover:scale-110 ${
+                className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-card/90 backdrop-blur-sm rounded-full border border-black sm:flex items-center justify-center transition-all duration-200 hover:bg-card hover:scale-110 ${
                   canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
+                } ${isMobile ? 'opacity-0 pointer-events-none' : ''}`}
               >
                 <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
               </button>
@@ -102,9 +114,9 @@ export const TrendingProjects = () => {
               {/* Right Navigation Arrow */}
               <button
                 onClick={scrollRight}
-                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-card/90 backdrop-blur-sm rounded-full border border-black hidden sm:flex items-center justify-center transition-all duration-200 hover:bg-card hover:scale-110 ${
+                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-card/90 backdrop-blur-sm rounded-full border border-black sm:flex items-center justify-center transition-all duration-200 hover:bg-card hover:scale-110 ${
                   canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
+                } ${isMobile ? 'opacity-0 pointer-events-none' : ''}`}
               >
                 <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-foreground" />
               </button>

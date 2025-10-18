@@ -1,10 +1,10 @@
 export const Hero = () => {
   return (
     <section data-testid="hero-section" className="relative w-full py-8 md:py-12 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
-      {/* Animated Background Elements - Hidden on Mobile */}
-      <div className="absolute inset-0 overflow-hidden hidden md:block">
-        <div className="absolute top-20 left-10 w-48 h-48 bg-primary/20 rounded-full filter blur-2xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-56 h-56 bg-purple-500/20 rounded-full filter blur-2xl animate-pulse delay-1000"></div>
+      {/* Animated Background Elements - Responsive */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-10 left-5 w-24 h-24 sm:top-20 sm:left-10 sm:w-48 sm:h-48 bg-primary/10 sm:bg-primary/20 rounded-full filter blur-xl sm:blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-5 w-28 h-28 sm:bottom-20 sm:right-10 sm:w-56 sm:h-56 bg-purple-500/10 sm:bg-purple-500/20 rounded-full filter blur-xl sm:blur-2xl animate-pulse delay-1000"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">

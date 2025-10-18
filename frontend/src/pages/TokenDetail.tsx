@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useTokenIntegration } from "@/hooks/useTokenIntegration";
+import { useWeb3 } from "@/hooks/useWeb3";
 import {
   PriceChangeAnimation,
   AnimatedTradeButton,
@@ -728,37 +729,93 @@ const TokenDetail = () => {
             </div>
 
             {/* Mobile Token Header */}
-            <div className="lg:hidden mb-6">
-              <div className="bg-card rounded-xl border border-border p-4">
-                <div className="flex items-start gap-3 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-2xl flex-shrink-0">
+            <div className="lg:hidden mb-4 sm:mb-6">
+              <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+                <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-muted flex items-center justify-center text-lg sm:text-2xl flex-shrink-0">
                     {getTokenLogo(displayToken)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-primary text-sm font-semibold mb-1">{getTokenSymbol(displayToken)}</div>
-                    <h1 className="text-lg font-bold text-foreground leading-tight capitalize truncate">{displayToken.name}</h1>
+                    <div className="text-primary text-xs sm:text-sm font-semibold mb-1">{getTokenSymbol(displayToken)}</div>
+                    <h1 className="text-base sm:text-lg font-bold text-foreground leading-tight capitalize truncate">{displayToken.name}</h1>
                   </div>
                 </div>
 
-                <div className="text-center mb-4">
+                <div className="text-center mb-3 sm:mb-4">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <PriceChangeAnimation priceChange={priceChange}>
-                      <div className="text-foreground font-bold text-xl animate-fade-in">
+                      <div className="text-foreground font-bold text-lg sm:text-xl animate-fade-in">
                         ${currentPriceInUSD.toFixed(6)}
                       </div>
                     </PriceChangeAnimation>
                     {isPriceUpdating && (
                       <div className="animate-spin">
-                        <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                        <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                       </div>
                     )}
                   </div>
-                  <div className={`text-sm ${priceChange >= 0 ? 'text-green-500 price-up' : 'text-red-500 price-down'} transition-smooth font-medium`}>
+                  <div className={`text-xs sm:text-sm ${priceChange >= 0 ? 'text-green-500 price-up' : 'text-red-500 price-down'} transition-smooth font-medium`}>
                     {priceChange >= 0 ? '↑' : '↓'} {Math.abs(priceChange).toFixed(2)}%
                   </div>
-                  <div className="text-xs text-muted-foreground mt-2 animate-fade-in">
+                  <div className="text-[10px] sm:text-xs text-muted-foreground mt-1 sm:mt-2 animate-fade-in">
                     MC: {formatNumber(parseMarketCap(marketCap))} | Vol: {formatNumber((analytics?.volume24h ? analytics.volume24h * bnbToUsdRate : 0))}
                   </div>
+                </div>
+
+                {/* Social Actions - Mobile */}
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <button
+                    onClick={handleLike}
+                    className={`inline-flex items-center gap-1 text-[10px] px-3 py-1.5 rounded-md border transition-colors ${
+                      isLiked
+                        ? 'bg-primary/20 border-primary/30 text-primary'
+                        : 'border-border bg-card hover:bg-muted text-foreground'
+                    }`}
+                  >
+                    <Heart className={`w-3 h-3 ${isLiked ? 'fill-current' : ''}`} />
+                    <span>{isLiked ? 'Liked' : 'Like'}</span>
+                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowSocialShare(!showSocialShare)}
+                      className="inline-flex items-center gap-1 text-[10px] px-3 py-1.5 rounded-md border border-border bg-card hover:bg-muted transition-colors text-foreground"
+                    >
+                      <Share2 className="w-3 h-3" />
+                      <span>Share</span>
+                    </button>
+                    {showSocialShare && (
+                      <div className="absolute top-full right-0 mt-1 bg-card border border-border rounded-md shadow-lg p-1 z-50 min-w-[140px]">
+                        <button
+                          onClick={shareOnTwitter}
+                          className="w-full flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-muted rounded transition-colors text-left"
+                        >
+                          <Twitter className="w-3 h-3 text-blue-500" />
+                          Twitter
+                        </button>
+                        <button
+                          onClick={shareOnTelegram}
+                          className="w-full flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-muted rounded transition-colors text-left"
+                        >
+                          <MessageCircle className="w-3 h-3 text-blue-400" />
+                          Telegram
+                        </button>
+                        <button
+                          onClick={copyShareLink}
+                          className="w-full flex items-center gap-2 px-2 py-1.5 text-xs hover:bg-muted rounded transition-colors text-left"
+                        >
+                          <Copy className="w-3 h-3" />
+                          Copy Link
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleCopyAddress}
+                    className="inline-flex items-center gap-1 text-[10px] px-3 py-1.5 rounded-md border border-border bg-card hover:bg-muted transition-colors text-foreground"
+                  >
+                    {copiedAddress ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedAddress ? 'Copied!' : 'Copy'}</span>
+                  </button>
                 </div>
 
                 {/* Quick Actions - Mobile */}
@@ -1143,39 +1200,39 @@ const TokenDetail = () => {
   
   
               {/* Mobile Analytics */}
-              <div className="bg-card rounded-xl border border-border p-4">
-                <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
-                  <Activity className="w-5 h-5 text-blue-500" />
+              <div className="bg-card rounded-xl border border-border p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-bold flex items-center gap-2 mb-3 sm:mb-4">
+                  <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
                   Analytics
                 </h3>
 
                 {loading ? (
-                  <div className="flex items-center justify-center h-32">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  <div className="flex items-center justify-center h-24 sm:h-32">
+                    <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-muted-foreground" />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">24h Volume</p>
-                      <p className="font-semibold text-sm mt-1">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">24h Volume</p>
+                      <p className="font-semibold text-xs sm:text-sm mt-1">
                         {formatNumber((analytics?.volume24h ? analytics.volume24h * bnbToUsdRate : 0))}
                       </p>
                     </div>
-                    <div className="text-center p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">Market Cap</p>
-                      <p className="font-semibold text-sm mt-1">
+                    <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">Market Cap</p>
+                      <p className="font-semibold text-xs sm:text-sm mt-1">
                         {formatNumber((analytics?.marketCap || 0))}
                       </p>
                     </div>
-                    <div className="text-center p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">ATH Price</p>
-                      <p className="font-semibold text-sm mt-1">
+                    <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">ATH Price</p>
+                      <p className="font-semibold text-xs sm:text-sm mt-1">
                         {formatNumber((analytics?.athPrice ? analytics.athPrice * bnbToUsdRate : 0))}
                       </p>
                     </div>
-                    <div className="text-center p-3 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">24h Change</p>
-                      <p className={`font-semibold text-sm mt-1 ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className="text-center p-2 sm:p-3 bg-muted/50 rounded-lg">
+                      <p className="text-[10px] sm:text-xs text-muted-foreground">24h Change</p>
+                      <p className={`font-semibold text-xs sm:text-sm mt-1 ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                         {priceChange >= 0 ? '↑' : '↓'} {Math.abs(priceChange).toFixed(2)}%
                       </p>
                     </div>
@@ -1189,7 +1246,7 @@ const TokenDetail = () => {
               </Suspense>
 
               {/* Mobile Tabs */}
-              <div className="bg-card rounded-xl border border-border">
+              <div className="bg-card rounded-xl border border-border overflow-hidden">
                 <div className="flex items-center border-b border-border">
                   <button
                     onClick={() => setActiveTab("trades")}
@@ -1213,7 +1270,7 @@ const TokenDetail = () => {
                   </button>
                 </div>
 
-                <div className="min-h-[400px]">
+                <div className="min-h-[500px] max-h-[600px] overflow-y-auto">
                   {activeTab === 'trades' && (
                     <Suspense fallback={
                       <div className="flex items-center justify-center h-40">
@@ -1243,6 +1300,199 @@ const TokenDetail = () => {
                       <CommentsSection />
                     </Suspense>
                   )}
+                </div>
+              </div>
+
+              {/* Mobile Trading Panel */}
+              <div id="trading-section" className="bg-card rounded-xl border border-border p-4">
+                <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
+                  <Activity className="w-5 h-5 text-green-500" />
+                  Trade Token
+                </h3>
+
+                <div className="flex items-center justify-between mb-4">
+                  <div className="inline-flex rounded-lg border border-border bg-muted/30 p-1">
+                    <button
+                      onClick={() => setTradeMode("buy")}
+                      className={`px-4 py-2 rounded-md font-bold text-sm ${
+                        tradeMode === "buy"
+                          ? "bg-green-500 text-white shadow-lg"
+                          : "text-muted-foreground hover:text-foreground hover:bg-green-500/10"
+                      }`}
+                    >
+                      Buy
+                    </button>
+                    <button
+                      onClick={() => setTradeMode("sell")}
+                      className={`px-4 py-2 rounded-md font-bold text-sm ${
+                        tradeMode === "sell"
+                          ? "bg-red-500 text-white shadow-lg"
+                          : "text-muted-foreground hover:text-foreground hover:bg-red-500/10"
+                      }`}
+                    >
+                      Sell
+                    </button>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {tradeMode === "buy" ? "Buying" : "Selling"} {fromToken}
+                  </div>
+                </div>
+
+                {/* From input */}
+                <div className="mb-3">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+                    <span>From</span>
+                    <span className="text-foreground/70">
+                      Balance: {fromToken === "BNB" ? "5.2" : "0"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-3">
+                    <button className="px-3 py-1.5 rounded-md border border-border bg-card text-sm">
+                      {fromToken}
+                    </button>
+                    <input
+                      inputMode="decimal"
+                      value={fromAmount}
+                      onChange={(e) => setFromAmount(e.target.value)}
+                      placeholder="0.0"
+                      className="flex-1 bg-transparent outline-none text-right text-base"
+                    />
+                  </div>
+                </div>
+
+                {/* Swap button */}
+                <div className="flex justify-center my-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const temp = fromToken;
+                      setFromToken(toToken);
+                      setToToken(temp);
+                    }}
+                    className="h-10 w-10 rounded-full border border-border bg-card flex items-center justify-center hover:bg-muted/40"
+                  >
+                    <ArrowUpDown className="h-5 w-5 text-muted-foreground" />
+                  </button>
+                </div>
+
+                {/* To input */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+                    <span>To</span>
+                    <span className="text-foreground/70">Est.</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-3">
+                    <button className="px-3 py-1.5 rounded-md border border-border bg-card text-sm">
+                      {toToken}
+                    </button>
+                    <input
+                      inputMode="decimal"
+                      value={toAmount}
+                      readOnly
+                      placeholder="0.0"
+                      className="flex-1 bg-transparent outline-none text-right text-base"
+                    />
+                  </div>
+                </div>
+
+                {/* Slippage selector */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-2">
+                    <span>Slippage</span>
+                    <span className="text-foreground/70">{slippage}%</span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {[0.5, 1.0, 2.0, 5.0].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => { setSlippage(s); setCustomSlip(""); }}
+                        className={`px-3 py-1.5 rounded-md border text-sm ${
+                          slippage === s && !customSlip ? 'bg-muted/50 border-border' : 'bg-card border-border hover:bg-muted/40'
+                        }`}
+                      >
+                        {s}%
+                      </button>
+                    ))}
+                    <input
+                      value={customSlip}
+                      onChange={(e) => setCustomSlip(e.target.value)}
+                      placeholder="Custom %"
+                      className="w-24 px-3 py-1.5 rounded-md border border-border bg-background text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* MEV protection */}
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>MEV Protection</span>
+                  </div>
+                  <button
+                    onClick={() => setMevProtection(v => !v)}
+                    className={`h-6 w-11 rounded-full relative transition-colors ${
+                      mevProtection ? 'bg-green-500/70' : 'bg-muted/50'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${
+                      mevProtection ? 'right-0.5' : 'left-0.5'
+                    }`} />
+                  </button>
+                </div>
+
+                {/* Action Button */}
+                <AnimatedTradeButton
+                  variant={!walletAddress ? "connect" : tradeMode === "buy" ? "buy" : "sell"}
+                  isLoading={isConnecting}
+                  onClick={async () => {
+                    if (!walletAddress) {
+                      await connectWallet();
+                    } else if (tradeMode === "buy") {
+                      await handleBuy();
+                    } else {
+                      await handleSell();
+                    }
+                  }}
+                  className="w-full h-12 text-lg"
+                >
+                  {!walletAddress
+                    ? 'Connect Wallet'
+                    : tradeMode === "buy"
+                    ? "Buy"
+                    : "Sell"
+                  }
+                </AnimatedTradeButton>
+
+                <div className="mt-3 text-[11px] text-muted-foreground text-center">
+                  Network: {!walletAddress ? '-' : 'BSC'}
+                </div>
+
+                {/* Bonding Progress */}
+                <div className="mt-4 pt-4 border-t border-border">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Bonding Progress</h4>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-500 ease-out"
+                        style={{ width: `${('progress' in displayToken ? displayToken.progress : 60)}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {'progress' in displayToken ? displayToken.progress : 60}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>
+                      {(() => {
+                        const progress = 'progress' in displayToken ? displayToken.progress : 60;
+                        const currentAmount = (progress / 100) * BONDING_CURVE_CONFIG.GROSS_RAISE;
+                        return `${currentAmount.toFixed(1)} BNB in bonding curve`;
+                      })()}
+                    </span>
+                    <span>
+                      • {BONDING_CURVE_CONFIG.GROSS_RAISE} BNB to graduate
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

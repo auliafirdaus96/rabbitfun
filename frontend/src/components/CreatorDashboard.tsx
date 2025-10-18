@@ -77,44 +77,46 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
   }
 
   return (
-    <div className={`space-y-8 ${className}`}>
+    <div className={`space-y-6 sm:space-y-8 ${className}`}>
       {/* Navigation */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <Button
           variant="ghost"
           onClick={() => window.location.href = '/'}
-          className="gap-2"
+          className="gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
+          <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">Back to Dashboard</span>
+          <span className="sm:hidden">Back</span>
         </Button>
       </div>
 
       {/* Header */}
       <div className="flex items-start">
         <div>
-          <h2 className="text-3xl font-bold">Creator Profile</h2>
-          <p className="text-text-light">Manage your tokens and claim rewards</p>
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">Creator Profile</h2>
+          <p className="text-xs sm:text-sm text-text-light">Manage your tokens and claim rewards</p>
         </div>
       </div>
 
       {/* Profile Card */}
       <Card className="border-border/40 bg-card">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-purple-500 rounded-xl flex items-center justify-center">
-                <Trophy className="w-8 h-8 text-white" />
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-purple-500 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
-              <div>
-                <CardTitle className="text-2xl">Token Creator</CardTitle>
-                <CardDescription className="flex items-center gap-2 mt-1">
-                  <Wallet className="w-4 h-4" />
-                  {formatAddress(mockCreatorAddress)}
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-lg sm:text-2xl">Token Creator</CardTitle>
+                <CardDescription className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
+                  <Wallet className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="font-mono text-xs sm:text-sm truncate">{formatAddress(mockCreatorAddress)}</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(mockCreatorAddress)}
+                    className="h-6 w-6 sm:h-8 sm:w-8 p-0 flex-shrink-0"
                   >
                     <Copy className="w-3 h-3" />
                   </Button>
@@ -122,13 +124,14 @@ export const CreatorDashboard: React.FC<CreatorDashboardProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => window.open(`https://bscscan.com/address/${mockCreatorAddress}`, '_blank')}
+                    className="h-6 w-6 sm:h-8 sm:w-8 p-0 flex-shrink-0"
                   >
                     <ExternalLink className="w-3 h-3" />
                   </Button>
                 </CardDescription>
               </div>
             </div>
-            <Badge variant="secondary" className="text-lg px-3 py-1">
+            <Badge variant="secondary" className="text-sm sm:text-lg px-2 py-1 sm:px-3 sm:py-1 whitespace-nowrap">
               {totalTokens} Tokens
             </Badge>
           </div>

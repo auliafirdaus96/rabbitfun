@@ -248,13 +248,17 @@ const startServer = async () => {
       logger.info('Server will start without database connection. Some features may be limited.');
     }
 
-    // Connect to Redis (non-blocking for development)
-    try {
-      await connectRedis();
-      logger.info('Redis connected successfully.');
-    } catch (redisError) {
-      logger.warn('Redis connection failed, continuing without caching:', redisError);
-      logger.info('Server will start without Redis. Caching features will be disabled.');
+    // Connect to Redis (only if enabled)
+    if (process.env.REDIS_ENABLED === 'true') {
+      try {
+        await connectRedis();
+        logger.info('Redis connected successfully.');
+      } catch (redisError) {
+        logger.warn('Redis connection failed, continuing without caching:', redisError);
+        logger.info('Server will start without Redis. Caching features will be disabled.');
+      }
+    } else {
+      logger.info('Redis is disabled. Skipping Redis connection.');
     }
 
     // Initialize contract integration service

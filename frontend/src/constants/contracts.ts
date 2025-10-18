@@ -114,11 +114,14 @@ export const CONTRACTS = {
               {"internalType": "uint256", "name": "soldSupply", "type": "uint256"},
               {"internalType": "uint256", "name": "totalBNB", "type": "uint256"},
               {"internalType": "uint256", "name": "initialPrice", "type": "uint256"},
-              {"internalType": "uint256", "name": "slope", "type": "uint256"},
+              {"internalType": "uint256", "name": "totalPlatformFees", "type": "uint256"},
+              {"internalType": "uint256", "name": "totalCreatorFees", "type": "uint256"},
+              {"internalType": "uint256", "name": "bondingCurveLiquidity", "type": "uint256"},
+              {"internalType": "uint256", "name": "liquidityPoolAmount", "type": "uint256"},
               {"internalType": "bool", "name": "graduated", "type": "bool"},
               {"internalType": "bool", "name": "exists", "type": "bool"}
             ],
-            "internalType": "struct AhiruLaunchpad.TokenState",
+            "internalType": "struct RabbitLaunchpad.TokenState",
             "name": "",
             "type": "tuple"
           }

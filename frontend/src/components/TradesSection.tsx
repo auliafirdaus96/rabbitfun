@@ -42,11 +42,11 @@ const TradesSection = ({
     <>
       <div className="py-2">
         {/* Header columns */}
-        <div className="grid grid-cols-6 gap-2 px-4 py-2 text-xs uppercase text-muted-foreground border-b border-border">
-          <div className="text-left">Account</div>
+        <div className="grid grid-cols-5 sm:grid-cols-6 gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-[10px] sm:text-xs uppercase text-muted-foreground border-b border-border">
+          <div className="text-left hidden sm:block">Account</div>
           <button
             onClick={() => toggleSort("side")}
-            className="text-left hover:text-foreground transition-colors"
+            className="text-left hover:text-foreground transition-colors col-span-1"
           >
             Type
             {sortKey === "side" && (
@@ -55,47 +55,47 @@ const TradesSection = ({
           </button>
           <button
             onClick={() => toggleSort("amount")}
-            className="text-left hover:text-foreground transition-colors"
+            className="text-left hover:text-foreground transition-colors col-span-1"
           >
-            Amount (BNB)
+            BNB
             {sortKey === "amount" && (
               <span className="ml-1 text-xs">{sortDir === "asc" ? "↑" : "↓"}</span>
             )}
           </button>
-          <div className="text-left">Amount ({coinTicker})</div>
+          <div className="text-left hidden sm:block">{coinTicker}</div>
           <button
             onClick={() => toggleSort("time")}
-            className="text-left hover:text-foreground transition-colors"
+            className="text-left hover:text-foreground transition-colors col-span-1"
           >
             Time
             {sortKey === "time" && (
               <span className="ml-1 text-xs">{sortDir === "asc" ? "↑" : "↓"}</span>
             )}
           </button>
-          <div className="text-left">Txn</div>
+          <div className="text-left hidden sm:block">Txn</div>
         </div>
 
         <div className="divide-y divide-border">
           {visible.map((t, i) => (
             <div
               key={`${t.account}-${i}`}
-              className="grid grid-cols-6 gap-2 px-4 py-2 text-sm hover:bg-muted/20 transition-colors"
+              className="grid grid-cols-5 sm:grid-cols-6 gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-xs sm:text-sm hover:bg-muted/20 transition-colors"
             >
-              <div className="truncate text-muted-foreground font-mono">{formatWalletAddress(t.account)}</div>
+              <div className="truncate text-muted-foreground font-mono text-[10px] sm:text-xs hidden sm:block">{formatWalletAddress(t.account)}</div>
               <div
-                className="font-bold text-base"
+                className="font-bold text-xs sm:text-base flex items-center justify-center"
                 style={{
                   color: t.type?.toUpperCase() === 'BUY' ? '#10b981' : t.type?.toUpperCase() === 'SELL' ? '#ef4444' : '#6b7280'
                 }}
               >
                 {t.type?.toUpperCase() || 'UNKNOWN'}
               </div>
-              <div className="text-foreground font-mono">{parseFloat(String(t.amountBNB || '0')).toFixed(3)}</div>
-              <div className="text-muted-foreground">{t.amountToken}</div>
-              <div className="text-muted-foreground">
-                {Math.floor((Date.now() - t.time) / (1000 * 60))}m ago
+              <div className="text-foreground font-mono text-xs sm:text-sm">{parseFloat(String(t.amountBNB || '0')).toFixed(3)}</div>
+              <div className="text-muted-foreground text-xs sm:text-sm hidden sm:block">{t.amountToken}</div>
+              <div className="text-muted-foreground text-xs sm:text-sm text-center">
+                {Math.floor((Date.now() - t.time) / (1000 * 60))}m
               </div>
-              <div className="text-muted-foreground font-mono text-xs">{formatWalletAddress(t.txn)}</div>
+              <div className="text-muted-foreground font-mono text-[9px] sm:text-xs hidden sm:block">{formatWalletAddress(t.txn)}</div>
             </div>
           ))}
 

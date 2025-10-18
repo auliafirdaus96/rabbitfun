@@ -1,15 +1,15 @@
 const CommentsSection = () => {
   return (
-    <div className="px-4 py-6 text-center text-sm text-muted-foreground flex-1">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-12 w-12 rounded-full bg-muted/30 flex items-center justify-center">
-          <span className="text-2xl">💬</span>
+    <div className="px-3 sm:px-4 py-4 sm:py-6 text-center text-xs sm:text-sm text-muted-foreground flex-1">
+      <div className="flex flex-col items-center gap-3 sm:gap-4">
+        <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-muted/30 flex items-center justify-center">
+          <span className="text-xl sm:text-2xl">💬</span>
         </div>
         <div>
-          <h3 className="font-medium text-foreground mb-1">No comments yet</h3>
-          <p className="text-muted-foreground">Be the first to share your thoughts about this token!</p>
+          <h3 className="font-medium text-foreground mb-1 text-sm sm:text-base">No comments yet</h3>
+          <p className="text-muted-foreground text-xs sm:text-sm">Be the first to share your thoughts about this token!</p>
         </div>
-        <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm hover:bg-primary/90 transition-colors">
+        <button className="px-3 py-2 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-lg text-xs sm:text-sm hover:bg-primary/90 transition-colors">
           Write a Comment
         </button>
       </div>

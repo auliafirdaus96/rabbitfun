@@ -49,7 +49,7 @@ export const FeaturedCoins = () => {
               ))}
             </div>
           ) : featuredTokens.length > 0 ? (
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-6xl mx-auto px-2 sm:px-4">
               {/* Featured Coins Grid - 2 Cards Per Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 {featuredTokens.map((coin, index) => (

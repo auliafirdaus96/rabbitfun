@@ -152,7 +152,7 @@ export const TokenCard = ({ token }: TokenCardProps) => {
   return (
     <div
       onClick={handleClick}
-      className={`relative flex bg-card text-card-foreground rounded-2xl p-6 gap-6 items-center hover:bg-background transition-all duration-300 cursor-pointer min-w-[500px] border border-black ${
+      className={`relative flex bg-card text-card-foreground rounded-xl sm:rounded-2xl p-4 sm:p-6 gap-4 sm:gap-6 items-center hover:bg-background transition-all duration-300 cursor-pointer w-full min-w-0 sm:min-w-[500px] border border-black ${
         isHovered ? 'shadow-lg shadow-black/20 transform -translate-y-1' : ''
       } ${
         isNavigating ? 'opacity-75 scale-95' : ''
@@ -176,7 +176,7 @@ export const TokenCard = ({ token }: TokenCardProps) => {
       </button>
 
       {/* Logo Area */}
-      <div className="w-32 h-32 rounded-xl overflow-hidden flex-shrink-0 bg-input border border-black">
+      <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-lg sm:rounded-xl overflow-hidden flex-shrink-0 bg-input border border-black">
         <LazyImage
           src={getPlaceholderImage(token.name, token.ticker)}
           alt={token.name}

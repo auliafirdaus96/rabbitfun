@@ -5,6 +5,12 @@ let redisClient: RedisClientType;
 
 export const connectRedis = async (): Promise<RedisClientType> => {
   try {
+    // Check if Redis is enabled
+    if (process.env.REDIS_ENABLED !== 'true') {
+      logger.warn('Redis is disabled, skipping connection');
+      return null as any;
+    }
+
     const redisUrl = process.env.REDIS_URL;
     const redisPassword = process.env.REDIS_PASSWORD;
 
